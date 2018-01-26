@@ -12,6 +12,6 @@
   <li>Xamarin.Forms Example</li>
   <li>Xamarin.Android MagTek</li>
   <li>Xamarin.iOS MagTek</li>
-  <li>MTSCRA_Bindings.iOS</li>
+  <li><strike>MTSCRA_Bindings.iOS</strike></li>
   <li><strike>MTSCRA_Bindings.Android</strike></li>
 </ul>
