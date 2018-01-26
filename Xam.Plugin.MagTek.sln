@@ -1,0 +1,41 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27130.2024
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{1064576D-7A65-406C-B50D-79887FF838DE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "examples", "examples", "{51EB5454-3E83-43D7-B56D-5DDBE1247382}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{1419D1C1-4D81-44C7-919F-C02510709696}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MTSCRA_Bindings.Android", "src\MTSCRA_Bindings.Android\MTSCRA_Bindings.Android.csproj", "{100A3165-1E16-4AA9-9C8E-CF16E50023E0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MTSCRA_Bindings.iOS", "src\MTSCRA_Bindings.iOS\MTSCRA_Bindings.iOS.csproj", "{E4B3B7AB-90A6-478D-86F4-7980C74B9745}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{100A3165-1E16-4AA9-9C8E-CF16E50023E0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{100A3165-1E16-4AA9-9C8E-CF16E50023E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{100A3165-1E16-4AA9-9C8E-CF16E50023E0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{100A3165-1E16-4AA9-9C8E-CF16E50023E0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E4B3B7AB-90A6-478D-86F4-7980C74B9745}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E4B3B7AB-90A6-478D-86F4-7980C74B9745}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E4B3B7AB-90A6-478D-86F4-7980C74B9745}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E4B3B7AB-90A6-478D-86F4-7980C74B9745}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{100A3165-1E16-4AA9-9C8E-CF16E50023E0} = {1064576D-7A65-406C-B50D-79887FF838DE}
+		{E4B3B7AB-90A6-478D-86F4-7980C74B9745} = {1064576D-7A65-406C-B50D-79887FF838DE}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A47A37F8-AE13-4F49-BC1E-466AC94A34FB}
+	EndGlobalSection
+EndGlobal
