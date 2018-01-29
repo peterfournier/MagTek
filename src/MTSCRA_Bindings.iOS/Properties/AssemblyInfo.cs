@@ -12,15 +12,14 @@ using Foundation;
 // Information about this assembly is defined by the following attributes.
 // Change them to the values specific to your project.
 
-[assembly: AssemblyTitle("MTSCRA_Bindings.iOS")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("Xamarin.Bindings.MagTek.iOS")]
+[assembly: AssemblyDescription("MagTek mtscra.a bindings for Xamarin.iOS")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("MTSCRA_Bindings.iOS")]
+[assembly: AssemblyProduct("Xamarin.Bindings.MagTek.iOS")]
 [assembly: AssemblyCopyright("Copyright ©  2018")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
-
 // The assembly version has the format "{Major}.{Minor}.{Build}.{Revision}".
 // The form "{Major}.{Minor}.*" will automatically update the build and revision,
 // and "{Major}.{Minor}.{Build}.*" will update just the revision.

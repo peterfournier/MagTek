@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MTSCRA_Bindings.Android", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MTSCRA_Bindings.iOS", "src\MTSCRA_Bindings.iOS\MTSCRA_Bindings.iOS.csproj", "{E4B3B7AB-90A6-478D-86F4-7980C74B9745}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Xam.Plugin.MagTek.Android", "src\Xam.Plugin.MagTek.Android\Xam.Plugin.MagTek.Android.csproj", "{052CDC2E-3A38-4F4D-A23C-4B4935D4579F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{E4B3B7AB-90A6-478D-86F4-7980C74B9745}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E4B3B7AB-90A6-478D-86F4-7980C74B9745}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E4B3B7AB-90A6-478D-86F4-7980C74B9745}.Release|Any CPU.Build.0 = Release|Any CPU
+		{052CDC2E-3A38-4F4D-A23C-4B4935D4579F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{052CDC2E-3A38-4F4D-A23C-4B4935D4579F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{052CDC2E-3A38-4F4D-A23C-4B4935D4579F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{052CDC2E-3A38-4F4D-A23C-4B4935D4579F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -34,6 +40,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{100A3165-1E16-4AA9-9C8E-CF16E50023E0} = {1064576D-7A65-406C-B50D-79887FF838DE}
 		{E4B3B7AB-90A6-478D-86F4-7980C74B9745} = {1064576D-7A65-406C-B50D-79887FF838DE}
+		{052CDC2E-3A38-4F4D-A23C-4B4935D4579F} = {1064576D-7A65-406C-B50D-79887FF838DE}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A47A37F8-AE13-4F49-BC1E-466AC94A34FB}
