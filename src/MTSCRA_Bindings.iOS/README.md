@@ -79,5 +79,22 @@ public class MTSCRADelegates_iOS : MTSCRAEventDelegate
      // ... other events ommitted
 }
 ```
+**Xamarin.Forms project**
+```csharp
+public class YourPage : ContentPage
+{
+     private IMTSCRAService _cardReaderService = DependencyService.Get<IMTSCRAService>();
+     
+     public YourPage()
+     {
+          WireUpMagTekEvents();
+     }
+     
+     private WireUpMagTekEvents()
+     {     	 
+          _cardReaderService.OnDataReceivedDelegate += _cardReaderService_OnDataReceivedDelegate;
+     }
+}
+```
+> **Note:** refer to MagTeks API documentation for connecting/disconnecting from device. I will have examples and more plug and play features coming soon!
 
-That's it!
