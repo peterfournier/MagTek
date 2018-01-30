@@ -6,11 +6,11 @@ using Android.App;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("MTSCRA_Bindings.Android")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("Xamarin.Bindings.MagTek.Android")]
+[assembly: AssemblyDescription("MagTek mtscra.a bindings for Xamarin.Android")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("MTSCRA_Bindings.Android")]
+[assembly: AssemblyProduct("Xamarin.Bindings.MagTek.iOS")]
 [assembly: AssemblyCopyright("Copyright ©  2018")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

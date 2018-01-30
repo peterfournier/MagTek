@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>Xamarin.Bindings.MagTek.Android</id>
+    <version>$version$</version>
+    <title>$title$</title>
+    <authors>Peter Fournier</authors>
+    <owners>Peter Fournier</owners>
+    <!-- <licenseUrl>http://LICENSE_URL_HERE_OR_DELETE_THIS_LINE</licenseUrl> -->
+    <projectUrl>https://github.com/peterfournier/MagTek</projectUrl>
+    <!-- <iconUrl>http://ICON_URL_HERE_OR_DELETE_THIS_LINE</iconUrl> -->
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>MagTek mtscra.a bindings for Xamarin.Android</description>
+    <releaseNotes>Initial release.</releaseNotes>
+    <copyright>Copyright 2018</copyright>
+    <tags>MagTek Android Bindings</tags>
+  </metadata>
+</package>
