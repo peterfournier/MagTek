@@ -52,5 +52,8 @@
   <ItemGroup>
     <ObjcBindingNativeLibrary Include="libMTSCRA.a" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="README.md" />
+  </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.ObjCBinding.CSharp.targets" />
 </Project>
