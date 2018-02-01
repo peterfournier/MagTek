@@ -16,7 +16,7 @@ using MTSCRA_Bindings.Android;
 ```
 **MainActivity.cs**
 ```csharp
- protected override void OnCreate(Bundle bundle)
+protected override void OnCreate(Bundle bundle)
 {
      ...
      global::Xamarin.Forms.Forms.Init(this, bundle);
