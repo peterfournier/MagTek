@@ -69,6 +69,12 @@ public class MTSCRAService_Android : IMTSCRAService
     }
     
     // IMTSCRAService defines this method
+    public ICollection<IMagTekDevice> GetDiscoveredPeripherals()
+    {
+    	return _myLeCallBack.DevicesFound;
+    }
+    
+    // IMTSCRAService defines this method
     public void StartScanningForPeripherals()
     {
         // cannot scan if bluetooth is not enabled
