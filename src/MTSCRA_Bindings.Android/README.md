@@ -51,10 +51,10 @@ public class MTSCRAService_Android : IMTSCRAService
 
     public MTSCRAService_Android()
     {
-		_cardReader = MagTekApi.MTSCRA;        
+	_cardReader = MagTekApi.MTSCRA;        
         _cardReader.SetConnectionRetry(true);
 
-		// Not sure the bluetooth scanning is implemented correcly, but it works
+	// Not sure the bluetooth scanning is implemented correcly, but it works
         _myLeCallBack = new MyLeScanCallBack();
         BluetoothManager bluetoothManager = ((BluetoothManager)_context.GetSystemService(Context.BluetoothService));
         _bluetoothAdapter = bluetoothManager.Adapter;
@@ -64,11 +64,12 @@ public class MTSCRAService_Android : IMTSCRAService
         }
         _bluetoothAdapter.Enable();
 	
-		MagTekApi.MTSCRA_delegates.OnDataReceivedDelegate += MTSCRA_delegates_OnDataReceivedDelegate;
+	// Event handlers here
+	MagTekApi.MTSCRA_delegates.OnDataReceivedDelegate += MTSCRA_delegates_OnDataReceivedDelegate;
     }
     
-	// IMTSCRAService defines this method
-	public void StartScanningForPeripherals()
+    // IMTSCRAService defines this method
+    public void StartScanningForPeripherals()
     {
         // cannot scan if bluetooth is not enabled
         if (!_bluetoothAdapter.IsEnabled)
@@ -81,30 +82,27 @@ public class MTSCRAService_Android : IMTSCRAService
             _bluetoothAdapter.StopLeScan(_myLeCallBack);
             isScanning = false;
         }
-
-
-        //
+       
         isScanning = true;
         _bluetoothAdapter.StartLeScan(_myLeCallBack);
     }
 
-	// IMTSCRAService defines this method
-	public void StopScanningForPeripherals()
-        {
-
-            if (isScanning)
-            {
-                _bluetoothAdapter.StopLeScan(_myLeCallBack);
-                isScanning = false;
-            }
-        }
+    // IMTSCRAService defines this method
+    public void StopScanningForPeripherals()
+    {
+	if (isScanning)
+    	{
+	     _bluetoothAdapter.StopLeScan(_myLeCallBack);
+	     isScanning = false;
+    	}
+    }
 
     private void MTSCRA_delegates_OnDataReceivedDelegate(Com.Magtek.Mobile.Android.Mtlib.IMTCardData cardDataObj)
     {
         OnDataReceivedDelegate?.Invoke(getCardData(cardDataObj), null);
     }
 
-	private YOUR_PCL.Interfaces.IMTCardData getCardData(Com.Magtek.Mobile.Android.Mtlib.IMTCardData cardDataObj)
+    private YOUR_PCL.Interfaces.IMTCardData getCardData(Com.Magtek.Mobile.Android.Mtlib.IMTCardData cardDataObj)
     {
         string strYear = null, strMonth = null;
 
@@ -119,7 +117,7 @@ public class MTSCRAService_Android : IMTSCRAService
         catch (Exception)
         {
         }
-
+	
         return new MagTekCardData()
         {
             AdditionalInfoTrack1 = null,
@@ -177,7 +175,7 @@ public class MTSCRAService_Android : IMTSCRAService
         };
     }
 
-	class MyLeScanCallBack : Java.Lang.Object, ILeScanCallback
+    class MyLeScanCallBack : Java.Lang.Object, ILeScanCallback
     {
         public List<IMagTekDevice> DevicesFound { get; set; }
 
@@ -211,7 +209,7 @@ public delegate void OnDataReceivedDelegate(IMTCardData cardDataObj);
 public delegate void OnDeviceConnectionDidChangeDelegate(MTConnectionState connectionState);
 public delegate void OnDeviceResponseDelegate(string response);
 
-
+// more events to wire up on the MTEMVEvent class
 public class MTSCRA_delegates_droid : Com.Magtek.Mobile.Android.Mtlib.MTSCRAEvent, ICallback
 {
     public event OnCardDataStateChangedDelegate OnCardDataStateChangedDelegate;
