@@ -1,0 +1,445 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:enums="clr-namespace:XFMagTek.Enums"
+    xmlns:utils="clr-namespace:XFMagTek.Utilities"
+    x:Class="XFMagTek.Views.eDynamoDeviceSetupPage"
+    Title="MagTek device Manager"
+    >
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <Style x:Key="s1Label" TargetType="Label">
+            </Style>
+            <Style x:Key="s1LabelLarge" TargetType="Label">
+                <Setter Property="FontSize" Value="Large" />
+            </Style>
+            <Style x:Key="s1Activity" TargetType="ActivityIndicator">
+            </Style>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+        <ScrollView>
+            <StackLayout
+                HorizontalOptions="FillAndExpand"
+                VerticalOptions="FillAndExpand"
+                Padding="10"
+                >
+                <!--magtek device list-->
+                <Frame 
+                    x:Name="frame"
+                    BackgroundColor="{DynamicResource secondaryBackgroundColor}"
+                    Padding="10"
+                    HeightRequest="300"
+                    VerticalOptions="Start"
+                    >
+                    <StackLayout
+                        HorizontalOptions="FillAndExpand"
+                        VerticalOptions="FillAndExpand"
+                        >
+
+                        <!--header-->
+                        <StackLayout
+                            Margin="0,10,0,0"
+                            Orientation="Horizontal">
+                            <Label
+                                Margin="0,8,0,8"
+                                Style="{StaticResource s1LabelLarge}"
+                                Text="My Devices">
+                            </Label>
+                            <StackLayout
+                                Orientation="Horizontal"
+                                HorizontalOptions="EndAndExpand"
+                                >
+
+                                <Label 
+                                    Text="Add Device" 
+                                    TextColor="{DynamicResource linkColor}"
+                                    VerticalOptions="Center"
+                                    />
+
+                                <StackLayout.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding OnAddNewDeviceTapCommand}" />
+                                </StackLayout.GestureRecognizers>
+                            </StackLayout>
+                        </StackLayout>
+                        <StackLayout HeightRequest="1" BackgroundColor="Blue"></StackLayout>
+                        <!--scanning-->
+                        <StackLayout
+                            x:Name="scanningContainer"
+                            IsVisible="{Binding Scanning}"
+                            HorizontalOptions="CenterAndExpand"
+                            VerticalOptions="CenterAndExpand"
+                            >
+                            <Label
+                                HorizontalOptions="Center"
+                                Style="{StaticResource s1Label}"
+                                Text="Looking for Devices..."
+                                ></Label>
+                        </StackLayout>
+                        <!--no devices text-->
+                        <StackLayout
+                            IsVisible="{Binding ShowNoDevicesFound}"
+                            HorizontalOptions="Center"
+                            VerticalOptions="Center"
+                            >
+                            <Label
+                                LineBreakMode="WordWrap"
+                                HorizontalOptions="Center"
+                                VerticalOptions="Center"
+                                HorizontalTextAlignment="Center"
+                                VerticalTextAlignment="Center"
+                                Style="{StaticResource s1Label}"
+                                Text="No Devices found. Please click Add device to begin."
+                                ></Label>
+                        </StackLayout>
+                        <!--listview-->
+                        <ListView
+                            x:Name="sfMTDeviceListView" 
+                            IsVisible="{Binding Scanning, 
+                                Converter={x:Static utils:Converters.InverseBoolConverter}}"
+                            RowHeight="50"
+                            ItemsSource="{Binding DevicesList}"
+                            SelectedItem="{Binding SelectedDevice, Mode=TwoWay}"
+                            HeightRequest="180"
+                            HorizontalOptions="FillAndExpand"
+                            VerticalOptions="FillAndExpand"
+                            >
+                            <!--template-->
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid
+                                        RowSpacing="0"      
+                                        HorizontalOptions="FillAndExpand"
+                                        VerticalOptions="FillAndExpand"
+                                        >
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="45"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="*" />
+                                            <RowDefinition Height="1" />
+                                        </Grid.RowDefinitions>
+
+
+                                        <Label 
+                                            Grid.Column="1" 
+                                            LineBreakMode="NoWrap"
+                                            Style="{StaticResource s1Label}"
+                                            Text="{Binding Name}" 
+                                            VerticalTextAlignment="Center"
+                                            />
+
+                                        <StackLayout 
+                                            Grid.Row="1" 
+                                            Grid.ColumnSpan="2"
+                                            BackgroundColor="Gray" 
+                                            HeightRequest="1"/>
+                                    </Grid>
+
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+
+                        </ListView>
+                        <!--rescan & remove all-->
+                        <StackLayout
+                            HorizontalOptions="FillAndExpand"
+                            Orientation="Horizontal"
+                            VerticalOptions="End"
+                            >
+                            <Button
+                                Command="{Binding ScanForPeripheralsCommand}"
+                                Text="Rescan"
+                                HorizontalOptions="StartAndExpand">
+                            </Button>
+
+                            <Button
+                                Command="{Binding RemoveAllDevices}"
+                                Text="Delete All"
+                                HorizontalOptions="EndAndExpand">
+                            </Button>
+
+                        </StackLayout>
+                    </StackLayout>
+                </Frame>
+                
+                <!--debugging only-->
+                <!--<Label
+                    HorizontalOptions="FillAndExpand"
+                    LineBreakMode="WordWrap"
+                    Text="{Binding DeviceInfo}"
+                    VerticalOptions="FillAndExpand"
+                    >
+                </Label>-->
+                <!--setup views-->
+                <StackLayout
+                    IsVisible="{Binding ShowSetupSteps}">
+                    <!--edynamo selected-->
+                    <Frame
+                        IsVisible="{Binding SelectedDevice.DeviceType, 
+                                Converter={x:Static utils:Converters.StringsAreEqualToBoolConverter},
+                                ConverterParameter={x:Static enums:MTDeviceType.MAGTEKEDYNAMO }}"
+                        HorizontalOptions="FillAndExpand"
+                        Padding="8"
+                        >
+                        <StackLayout
+                            HorizontalOptions="FillAndExpand"
+                            VerticalOptions="FillAndExpand"
+                            Spacing="8">
+
+                            <Label 
+                                FontAttributes="Bold"
+                                Style="{StaticResource s1LabelLarge}" 
+                                Text="Steps to connect your eDynamo"
+                                ></Label>
+
+
+                            <StackLayout
+                                IsVisible="{Binding SelectedDevice.IsDeviceRegisteredToHost, 
+                                    Converter={x:Static utils:Converters.InverseBoolConverter}}"
+                                Spacing="0">
+                                <Label 
+                                    LineBreakMode="WordWrap"
+                                    Style="{StaticResource s1Label}" 
+                                    Text="1.  Ensure your host device has Bluetooth enabled."
+                                    ></Label>
+                        
+                                <Label 
+                                    LineBreakMode="WordWrap"
+                                    Style="{StaticResource s1Label}" 
+                                    Text="2.  Press and hold pairing button on your MagTek device until the blue LED flashes."
+                                    ></Label>
+
+                                <Label 
+                                    LineBreakMode="WordWrap"
+                                    Style="{StaticResource s1Label}" 
+                                    Text="3.  Once the blue LED flashes, press Connect button below."
+                                    ></Label>
+
+                                <Label 
+                                    FontAttributes="Bold"
+                                    LineBreakMode="WordWrap"
+                                    Style="{StaticResource s1Label}" 
+                                    Text="4. Enter six zeros for default pairing code if prompted."
+                                    ></Label>
+                                <Label 
+                                    FontAttributes="Bold"
+                                    LineBreakMode="WordWrap"
+                                    Style="{StaticResource s1Label}" 
+                                    Text="5. Once connected, click Register this Device."
+                                    ></Label>
+                            </StackLayout>
+
+                            <StackLayout
+                                Orientation="Horizontal"
+                                IsVisible="{Binding SelectedDevice.State, 
+                                    Converter={x:Static utils:Converters.InverseBoolConverter},
+                                    ConverterParameter={x:Static enums:MTConnectionState.Disconnected }}"
+                                >
+                                <Button
+                                    IsVisible="{Binding IsBusy, Converter={x:Static utils:Converters.InverseBoolConverter}}"
+                                    Command="{Binding ConnectToDeviceCommand}"
+                                    Text="Connect"
+                                    HorizontalOptions="Start">
+                                </Button>
+
+                                <ActivityIndicator
+                                    IsRunning="{Binding IsBusy}"
+                                    IsVisible="{Binding IsBusy}"
+                                    Style="{StaticResource s1Activity}"
+                                    HorizontalOptions="Start"
+                                    ></ActivityIndicator>
+                            </StackLayout>
+                        
+                            <StackLayout
+                                IsVisible="{Binding SelectedDevice.State, 
+                                    Converter={x:Static utils:Converters.InverseBoolConverter},
+                                    ConverterParameter={x:Static enums:MTConnectionState.Connected }}"
+                                >
+                                <Button
+                                    IsVisible="{Binding IsBusy, Converter={x:Static utils:Converters.InverseBoolConverter}}"
+                                    Command="{Binding DisconnectDevice}"
+                                    Text="Disconnect"
+                                    HorizontalOptions="Start">
+                                </Button>
+                            </StackLayout>
+
+                            <!--device status indicator-->
+                            <StackLayout
+                                Orientation="Horizontal"
+                                Spacing="6"
+                                HorizontalOptions="Start"
+                                >
+                                <BoxView
+                                    BackgroundColor="{Binding MagTekDeviceStateColor}"
+                                    HeightRequest="30"
+                                    WidthRequest="30"
+                                    VerticalOptions="Center"
+                                    >
+                                </BoxView>
+
+                                <Label
+                                    Style="{StaticResource s1Label}"
+                                    Text="{Binding ConnectionStatus}"
+                                    VerticalTextAlignment="Center"
+                                    >
+                                </Label>
+
+                            </StackLayout>
+
+                            <StackLayout
+                                IsVisible="{Binding SelectedDevice.State, 
+                                    Converter={x:Static utils:Converters.InverseBoolConverter},
+                                    ConverterParameter={x:Static enums:MTConnectionState.Connected }}"
+                                >
+                                <Button
+                                    IsVisible="{Binding SelectedDevice.IsDeviceRegisteredToHost, Converter={x:Static utils:Converters.InverseBoolConverter}}"
+                                    Command="{Binding OnRegisterDeviceTapCommand}"
+                                    Text="Register this Device"
+                                    HorizontalOptions="Start">
+                                </Button>
+                            </StackLayout>
+                        
+                            <Label 
+                                LineBreakMode="WordWrap"
+                                Style="{StaticResource s1Label}" 
+                                Text="Test swipe."
+                                ></Label>
+
+                            <Label 
+                                LineBreakMode="WordWrap"
+                                Style="{StaticResource s1Label}" 
+                                Text="{Binding DataResponse}"
+                                ></Label>
+
+
+                        </StackLayout>
+                    </Frame>
+                    <!--idynamo selected-->
+                    <Frame
+                        IsVisible="{Binding SelectedDevice.DeviceType, 
+                                Converter={x:Static utils:Converters.InverseBoolConverter},
+                                ConverterParameter={x:Static enums:MTDeviceType.MAGTEKIDYNAMO }}"
+                        BackgroundColor="{DynamicResource secondaryBackgroundColor}"
+                        Padding="8"
+                        HorizontalOptions="FillAndExpand"
+                        >
+                        <StackLayout
+                            HorizontalOptions="FillAndExpand"
+                            VerticalOptions="FillAndExpand"
+                            Spacing="8"
+                            >
+
+                            <Label 
+                                FontAttributes="Bold"
+                                Style="{StaticResource s1LabelLarge}" 
+                                Text="Steps to connect your iDynamo"
+                                ></Label>
+
+                            <Label 
+                                LineBreakMode="WordWrap"
+                                Style="{StaticResource s1Label}" 
+                                Text="1.  Ensure your iDynamo device is properly inserted."
+                                ></Label>
+
+                            <Label 
+                                LineBreakMode="WordWrap"
+                                Style="{StaticResource s1Label}" 
+                                Text="2.  Press Connect button below."
+                                ></Label>
+
+                            <StackLayout
+                                Orientation="Horizontal"
+                                IsVisible="{Binding SelectedDevice.State, 
+                                    Converter={x:Static utils:Converters.InverseBoolConverter},
+                                    ConverterParameter={x:Static enums:MTConnectionState.Disconnected }}"
+                                >
+                                <Button
+                                    IsVisible="{Binding IsBusy, Converter={x:Static utils:Converters.InverseBoolConverter}}"
+                                    Command="{Binding ConnectToDeviceCommand}"
+                                    Text="Connect"
+                                    HorizontalOptions="Start">
+                                </Button>
+
+                                <ActivityIndicator
+                                    IsRunning="{Binding IsBusy}"
+                                    IsVisible="{Binding IsBusy}"
+                                    Style="{StaticResource s1Activity}"
+                                    HorizontalOptions="Start"
+                                    ></ActivityIndicator>
+                            </StackLayout>
+
+                            <StackLayout
+                                IsVisible="{Binding SelectedDevice.State, 
+                                    Converter={x:Static utils:Converters.InverseBoolConverter},
+                                    ConverterParameter={x:Static enums:MTConnectionState.Connected }}"
+                                >
+                                <Button
+                                    IsVisible="{Binding IsBusy, Converter={x:Static utils:Converters.InverseBoolConverter}}"
+                                    Command="{Binding DisconnectDevice}"
+                                    Text="Disconnect"
+                                    HorizontalOptions="Start">
+                                </Button>
+                            </StackLayout>
+
+                            <Label 
+                                LineBreakMode="WordWrap"
+                                Style="{StaticResource s1Label}" 
+                                Text="3.  Once connected, click Register this Device."
+                                ></Label>
+
+                            <!--device status indicator-->
+                            <StackLayout
+                                Orientation="Horizontal"
+                                Spacing="6"
+                                HorizontalOptions="Start"
+                                >
+                                <BoxView
+                                    BackgroundColor="{Binding MagTekDeviceStateColor}"
+                                    HeightRequest="30"
+                                    WidthRequest="30"
+                                    VerticalOptions="Center"
+                                    >
+                                </BoxView>
+
+                                <Label
+                                    Style="{StaticResource s1Label}"
+                                    Text="{Binding ConnectionStatus}"
+                                    VerticalTextAlignment="Center"
+                                    >
+                                </Label>
+
+                            </StackLayout>
+
+                            <StackLayout
+                                IsVisible="{Binding SelectedDevice.State, 
+                                    Converter={x:Static utils:Converters.InverseBoolConverter},
+                                    ConverterParameter={x:Static enums:MTConnectionState.Connected }}"
+                                >
+                                <Button
+                                    IsVisible="{Binding SelectedDevice.IsDeviceRegisteredToHost, Converter={x:Static utils:Converters.InverseBoolConverter}}"
+                                    Command="{Binding OnRegisterDeviceTapCommand}"
+                                    Text="Register this Device"
+                                    HorizontalOptions="Start">
+                                </Button>
+                            </StackLayout>
+
+                            <Label 
+                                LineBreakMode="WordWrap"
+                                Style="{StaticResource s1Label}" 
+                                Text="Test swipe."
+                                ></Label>
+
+                            <Label 
+                                LineBreakMode="WordWrap"
+                                Style="{StaticResource s1Label}" 
+                                Text="{Binding DataResponse}"
+                                ></Label>
+
+                        </StackLayout>
+                    </Frame>
+                </StackLayout>
+            </StackLayout>
+        </ScrollView>
+</ContentPage>
