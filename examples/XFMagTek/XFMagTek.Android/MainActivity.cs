@@ -38,11 +38,17 @@ namespace XFMagTek.Droid
 
             foreach (string permission in Permissions)
             {
-                if (CheckSelfPermission(permission) != Permission.Granted) minimumPermissionsGranted = false;
+                if (CheckSelfPermission(permission) != Permission.Granted) 
+                {
+                    minimumPermissionsGranted = false;
+                } 
             }
 
             // If one of the minimum permissions aren't granted, we request them from the user
-            if (!minimumPermissionsGranted) RequestPermissions(Permissions, 0);
+            //if (!minimumPermissionsGranted)
+            //{
+                RequestPermissions(Permissions, 0);
+            //}
         }
     }
 }

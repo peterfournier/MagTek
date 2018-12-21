@@ -3,6 +3,7 @@ using XFMagTek.Enums;
 using System;
 using System.Threading.Tasks;
 using System.ComponentModel;
+using Xamarin.Forms;
 
 namespace XFMagTek.Models.MagTek
 {
@@ -22,8 +23,6 @@ namespace XFMagTek.Models.MagTek
         public string Address { get { return _address; } set { SetPropertyChanged(ref _address, value, nameof(Address)); } }
         public int ProductId { get { return _productId; } set { SetPropertyChanged(ref _productId, value, nameof(ProductId)); } }
         private MTConnectionState _state;
-
-        public event PropertyChangedEventHandler PropertyChanged;
 
         public MTConnectionState State
         {
@@ -135,11 +134,15 @@ namespace XFMagTek.Models.MagTek
                     magtekService.CloseDevice();
                 }
 
-                // set device type to none
-                magtekService.SetDeviceType((int)MTDeviceType.MAGTEKNONE);
 
-                // set device type to none
-                magtekService.SetConnectionType((int)MTDeviceType.MAGTEKAUDIOREADER);
+                if (Device.RuntimePlatform == Device.iOS)
+                {
+                    // set device type to none
+                    magtekService.SetDeviceType((int)MTDeviceType.MAGTEKNONE);
+
+                    // set device type to none
+                    magtekService.SetConnectionType((int)MTDeviceType.MAGTEKAUDIOREADER);
+                }
 
                 State = MTConnectionState.Disconnected;
 

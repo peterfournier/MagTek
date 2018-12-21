@@ -31,7 +31,7 @@ namespace XFMagTek.Views
             base.OnDisappearing();
         }
     }
-    
+
 
     public class eDynamoDeviceSetupViewModel : BaseViewModel
     {
@@ -41,7 +41,7 @@ namespace XFMagTek.Views
         private bool _showNoDevicesFound;
         private Color _magTekDeviceStateColor;
         private ICommand _startScanningCommand;
-        private IeDynamoService _cardReaderService = DependencyService.Get<IeDynamoService>();        
+        private IeDynamoService _cardReaderService = DependencyService.Get<IeDynamoService>();
         private IMagTekDevice _selectedDevice;
         private ObservableCollection<IMagTekDevice> _devices;
         private string _connectionStatus;
@@ -120,7 +120,7 @@ namespace XFMagTek.Views
                     (_startScanningCommand = new Command(async () => await ExecuteScanCommand(), () => { return !IsBusy; }));
             }
         }
-      
+
         public IMagTekDevice SelectedDevice
         {
             get { return _selectedDevice; }
@@ -146,11 +146,7 @@ namespace XFMagTek.Views
         //        if (_currentEditingMagTekDevice == null) return;
         //    }
         //}
-        public ObservableCollection<IMagTekDevice> DevicesList
-        {
-            get { return _devices; }
-            set { SetProperty(ref _devices, value, nameof(DevicesList)); }
-        }
+        public ObservableCollection<IMagTekDevice> DevicesList { get; set; } = new ObservableCollection<IMagTekDevice>();
         public string ConnectionStatus
         {
             get { return _connectionStatus; }
@@ -193,35 +189,48 @@ namespace XFMagTek.Views
         private async Task ExecuteScanCommand()
         {
             Scanning = true;
-
-            // set device type we're searching for
-            _cardReaderService.SetDeviceType((int)MTDeviceType.MAGTEKEDYNAMO);
-            await Task.Delay(500); // little hack since this services aren't async
-
-            // start scanning
-            _cardReaderService.StartScanningForPeripherals();
-            await Task.Delay(500); // little hack since this services aren't async
-
-            // get list of any devices found during scan
-            var discoveredMagTekDevices = _cardReaderService.GetDiscoveredPeripherals();
-            await Task.Delay(500); // for animation
-
-            foreach (var item in discoveredMagTekDevices)
+            try
             {
-                if (IsDeviceRegistered(item))
-                {
-                    item.IsDeviceRegisteredToHost = true;
-                }
-                if (!IsDeviceAdded(item))
-                {
-                    item.DeviceType = MTDeviceType.MAGTEKEDYNAMO;
-                    DevicesList.Add(item);
-                }
-            }
-            // stop scanning
-            _cardReaderService.StopScanningForPeripherals();
+                // set device type we're searching for
+                _cardReaderService.SetDeviceType((int)MTDeviceType.MAGTEKEDYNAMO);
+                await Task.Delay(500); // little hack since this services aren't async
 
-            Scanning = false;
+                // start scanning
+                _cardReaderService.StartScanningForPeripherals();
+                await Task.Delay(500); // little hack since this services aren't async
+
+                // get list of any devices found during scan
+                var discoveredMagTekDevices = _cardReaderService.GetDiscoveredPeripherals();
+                await Task.Delay(500); // for animation
+
+                foreach (var item in discoveredMagTekDevices)
+                {
+                    if (IsDeviceRegistered(item))
+                    {
+                        item.IsDeviceRegisteredToHost = true;
+                    }
+                    if (!IsDeviceAdded(item))
+                    {
+                        item.DeviceType = MTDeviceType.MAGTEKEDYNAMO;
+                        if (item is IMagTekDevice)
+                        {
+                            DevicesList.Add(item);
+                        }
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+            finally
+            {
+                // stop scanning
+                _cardReaderService.StopScanningForPeripherals();
+
+                Scanning = false;
+            }
         }
         private bool IsDeviceAdded(IMagTekDevice device)
         {
@@ -278,7 +287,7 @@ namespace XFMagTek.Views
             }
             UpdateDeviceState();
         }
-       
+
         private void UpdateDeviceState()
         {
             switch (SelectedDevice?.State)
@@ -360,8 +369,10 @@ namespace XFMagTek.Views
         public void Initialize()
         {
             PropertyChanged += EDynamoDeviceSetupViewModel_PropertyChanged;
-            DevicesList = new ObservableCollection<IMagTekDevice>();
-            DevicesList.CollectionChanged += (sender, args) => { UpdateShowDevicesMessage(); };
+            DevicesList.CollectionChanged += (sender, args) =>
+            {
+                UpdateShowDevicesMessage();
+            };
             WireUpCardReaderEvents();
             //SetMyDeviceListView();
             UpdateShowDevicesMessage();
@@ -378,7 +389,7 @@ namespace XFMagTek.Views
                 {
                     await SelectedDevice.ConnectToDevice(_cardReaderService);
                 }
-                UpdateDeviceState();                
+                UpdateDeviceState();
             }
         }
         private void SetDeviceInfo(string additionalInfo = "")

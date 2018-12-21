@@ -1,16 +1,16 @@
-<?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:versionCode="1" android:versionName="1.0" package="com.companyname.XFMagTek">
-  <uses-sdk android:minSdkVersion="21" android:targetSdkVersion="27" />
-  <application android:label="XFMagTek.Android"></application>
-
-  <!--required for MagTek BLEEMV-->
-  <uses-feature android:name="android.hardware.bluetooth_le" android:enabled="true" />
-  <uses-permission android:name="android.permission.BLUETOOTH" />
-  <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
-  <uses-permission android:name="android.permission.BLUETOOTH_PRIVILEGED" />
-  
-  <application android:label="XFMagTek" android:icon="@drawable/icon">
-    <!--used for Magtek Ble Service-->
-    <service android:name="com.magtek.mobile.android.mtlib.MTBLEService" android:enabled="true" />
-  </application>
+﻿<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:versionCode="1" android:versionName="1.0" package="com.companyname.XFMagTek" android:installLocation="auto">
+	<uses-sdk android:minSdkVersion="21" android:targetSdkVersion="28" />
+	<uses-permission android:name="android.permission.BLUETOOTH" />
+	<uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+	<uses-permission android:name="android.permission.BLUETOOTH_PRIVILEGED" />
+	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+	<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+	<application android:label="XFMagTek.Android"></application>
+	<!--required for MagTek BLEEMV-->
+	<uses-feature android:name="android.hardware.bluetooth_le" android:enabled="true" />
+	<application android:label="XFMagTek" android:icon="@drawable/icon">
+		<!--used for Magtek Ble Service-->
+		<service android:name="com.magtek.mobile.android.mtlib.MTBLEService" android:enabled="true" />
+	</application>
 </manifest>

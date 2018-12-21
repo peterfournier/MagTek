@@ -10,10 +10,11 @@ using XFMagTek.Delegates.MagTek;
 using Com.Magtek.Mobile.Android.Mtlib;
 using XFMagTek.Models.MagTek;
 using XFMagTek.Droid;
+using System.Linq;
 
 [assembly: Xamarin.Forms.Dependency(typeof(MTSCRA_Service_droid))]
 namespace XFMagTek.Droid
-{   
+{
     public class MTSCRA_Service_droid : global::Xamarin.Forms.Platform.Android.FormsAppCompatActivity, IeDynamoService
     {
         private bool isScanning;
@@ -47,27 +48,9 @@ namespace XFMagTek.Droid
         public MTSCRA_Service_droid()
         {
             _cardReader = MagTekApi.MTSCRA;
-            //_cardReader = new MTSCRA(_context, new Handler(new MTSCRA_delegates_droid()));
             _cardReader.SetConnectionRetry(true);
-
+            _bluetoothAdapter = MagTekApi.BluetoothAdapter;
             _myLeCallBack = new MyLeScanCallBack();
-            //_myReceiver = new MyBroadcastReceiver();
-
-            ////  Register for broadcasts when a device is discovered
-            //IntentFilter filter = new IntentFilter(BluetoothDevice.ActionFound);
-            //_context.RegisterReceiver(_myReceiver, filter);
-            ////  Register for broadcasts when discovery has finished
-            //filter = new IntentFilter(BluetoothAdapter.ActionDiscoveryFinished);
-            //_context.RegisterReceiver(_myReceiver, filter);
-
-            BluetoothManager bluetoothManager = ((BluetoothManager)_context.GetSystemService(Context.BluetoothService));
-            _bluetoothAdapter = bluetoothManager.Adapter;
-            if ((_bluetoothAdapter == null))
-            {
-                Toast.MakeText(_context, 0, ToastLength.Short).Show();
-            }
-            _bluetoothAdapter.Enable();
-
 
             MagTekApi.MTSCRA_delegates.OnCardDataStateChangedDelegate += MTSCRA_delegates_OnCardDataStateChangedDelegate;
             MagTekApi.MTSCRA_delegates.OnDataReceivedDelegate += MTSCRA_delegates_OnDataReceivedDelegate;
@@ -278,9 +261,7 @@ namespace XFMagTek.Droid
             {
                 if (!_cardReader.IsDeviceConnected)
                 {
-                    //string address = "F0:C7:7F:54:33:C5";
-                    //_cardReader.SetConnectionType(MTConnectionType.Bleemv);
-                    //_cardReader.SetAddress(address);
+                    //_bluetoothAdapter.GetRemoteDevice(_cardReader.add)
                     _cardReader.OpenDevice();
                 }
             }
@@ -350,6 +331,10 @@ namespace XFMagTek.Droid
         public void SetAddress(string address)
         {
             _cardReader.SetAddress(address);
+            //_cardReader.SetConnectionType(MTConnectionType.Bluetooth);
+            var device = _bluetoothAdapter.GetRemoteDevice(address);
+            var bonded = device.CreateBond();
+            //_cardReader.OpenDevice();
         }
 
         public void SetConfigurationParams(string pData)
@@ -390,6 +375,7 @@ namespace XFMagTek.Droid
         public void SetDeviceType(int deviceType)
         {
             //_cardReader.setde
+            //_cardReader.device//
         }
 
         public int SetUserSelectionResult(byte status, byte selection)
@@ -415,6 +401,13 @@ namespace XFMagTek.Droid
             //
             isScanning = true;
             _bluetoothAdapter.StartLeScan(_myLeCallBack);
+            if (_bluetoothAdapter.BondedDevices != null)
+            {
+                foreach (var device in _bluetoothAdapter.BondedDevices)
+                {
+                    _myLeCallBack.AddDevice(device);
+                }
+            }
         }
 
         public int StartTransaction(byte timeLimit, byte cardType, byte option, byte amount, byte transactionType, byte cashBack, byte currencyCode, byte reportingOption)
@@ -680,7 +673,18 @@ namespace XFMagTek.Droid
 
             public void OnLeScan(BluetoothDevice device, int rssi, byte[] scanRecord)
             {
-                if (scanRecord != null && !string.IsNullOrWhiteSpace(device.Name))
+                if (scanRecord != null
+                    && !string.IsNullOrWhiteSpace(device.Name))
+                {
+                    AddDevice(device);
+                }
+            }
+
+            public void AddDevice(BluetoothDevice device)
+            {
+                if (!string.IsNullOrWhiteSpace(device.Name)
+                    && !DevicesFound.Any(x => x.Address == device.Address)
+                    )
                 {
                     DevicesFound.Add(new MagTekDevice()
                     {
@@ -697,15 +701,30 @@ namespace XFMagTek.Droid
 
     }
 
-     public static class MagTekApi
+    public static class MagTekApi
     {
         private static Android.Content.Context _context = Android.App.Application.Context;
         internal readonly static MTSCRA_delegates_droid MTSCRA_delegates = new MTSCRA_delegates_droid();
 
         public static MTSCRA MTSCRA;
+        public static BluetoothAdapter BluetoothAdapter;
         public static void Init()
         {
             MTSCRA = new MTSCRA(_context, new Handler(MTSCRA_delegates));
+            BluetoothAdapter = BluetoothAdapter.DefaultAdapter;
+            // is bluetooth enabled?
+            if (!BluetoothAdapter.IsEnabled)
+            {
+                BluetoothAdapter.Enable();
+            }
+            else
+            {
+                if ((BluetoothAdapter == null))
+                {
+                    Toast.MakeText(_context, 0, ToastLength.Short).Show();
+                }
+                BluetoothAdapter.Enable();
+            }
         }
     }
 
