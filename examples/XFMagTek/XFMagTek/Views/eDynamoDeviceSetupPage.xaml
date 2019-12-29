@@ -308,6 +308,7 @@
                                 LineBreakMode="WordWrap"
                                 Style="{StaticResource s1Label}" 
                                 Text="{Binding DataResponse}"
+                            
                                 ></Label>
 
 

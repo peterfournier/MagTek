@@ -98,10 +98,8 @@ namespace XFMagTek.Views
         {
             IsBusy = true;
             if (SelectedDevice != null)
-            {
+            {                
                 await SelectedDevice.ConnectToDevice(_cardReaderService);
-                UpdateDeviceState();
-
             }
         }, () => !IsBusy);
         public ICommand DisconnectDevice => new Command(async () =>
@@ -160,7 +158,6 @@ namespace XFMagTek.Views
             }
             set
             {
-                _dataResponse = value;
                 SetProperty(ref _dataResponse, value);
             }
         }
@@ -419,25 +416,14 @@ namespace XFMagTek.Views
         }
         private void _cardReaderService_OnDeviceConnectionDidChangeDelegate(int deviceType, bool connected, object instance, MTConnectionState state)
         {
-            string statusDidChange;
             try
             {
                 DataResponse = string.Empty;
                 if (SelectedDevice != null)
                 {
-                    if (connected)
-                    {
-
-                        statusDidChange = $"Connected";
-                        SelectedDevice.State = MTConnectionState.Connected;
-                    }
-                    else
-                    {
-                        statusDidChange = $"Disconnected";
-                        SelectedDevice.State = state;
-                    }
+                    SelectedDevice.State = state;
+                    UpdateDeviceState();
                 }
-                UpdateDeviceState();
             }
             catch (Exception)
             {
@@ -450,13 +436,13 @@ namespace XFMagTek.Views
             try
             {
                 DataResponse = "Data recieved. Your device is working correctly and is ready for use.";
-                //DataResponse += $"CardDataObj: {JsonConvert.SerializeObject(cardDataObj, Formatting.Indented, new JsonSerializerSettings() { ReferenceLoopHandling = ReferenceLoopHandling.Ignore })}";
-                //DataResponse += Environment.NewLine;
-                //DataResponse += $"InstanceObj: {JsonConvert.SerializeObject(instance, Formatting.Indented, new JsonSerializerSettings() { ReferenceLoopHandling = ReferenceLoopHandling.Ignore })}";
+                DataResponse += $"CardDataObj: {JsonConvert.SerializeObject(cardDataObj, Formatting.Indented, new JsonSerializerSettings() { ReferenceLoopHandling = ReferenceLoopHandling.Ignore })}";
+                DataResponse += Environment.NewLine;
+                DataResponse += $"InstanceObj: {JsonConvert.SerializeObject(instance, Formatting.Indented, new JsonSerializerSettings() { ReferenceLoopHandling = ReferenceLoopHandling.Ignore })}";
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                //DataResponse = $"Message: {ex.Message}{Environment.NewLine} Stacktrace: {ex.StackTrace}";
+                DataResponse = $"Message: {ex.Message}{Environment.NewLine} Stacktrace: {ex.StackTrace}";
             }
         }
         private void _cardReaderService_OnCardSwipeDidStartDelegate(object instance)
@@ -464,12 +450,13 @@ namespace XFMagTek.Views
             try
             {
                 DataResponse = "Swiped...";
-                //DataResponse = $"_cardReaderService_OnCardSwipeDidStartDelegate: {instance}";
-                //DataResponse += Environment.NewLine;
+                DataResponse = $"_cardReaderService_OnCardSwipeDidStartDelegate: {instance}";
+                DataResponse += Environment.NewLine;
             }
             catch (Exception ex)
             {
-                //DataResponse = $"Message: {ex.Message}{Environment.NewLine} Stacktrace: {ex.StackTrace}";
+                DataResponse = $"Message: {ex.Message}{Environment.NewLine} Stacktrace: {ex.StackTrace}";
+                DataResponse = $"Message: {ex.Message}{Environment.NewLine} Stacktrace: {ex.StackTrace}";
             }
         }
         private async void EDynamoDeviceSetupViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)

@@ -44,7 +44,8 @@ namespace XFMagTek.Models.MagTek
         {
             if (magtekService == null)
                 throw new ArgumentNullException();
-
+            
+            //State = MTConnectionState.Connecting;
             try
             {
                 bool isSwitchingDevice = IsSwitchingDevice(magtekService);
@@ -90,11 +91,10 @@ namespace XFMagTek.Models.MagTek
 
                     // open device
                     magtekService.OpenDevice();
-                    await Task.Delay(100);
                 }
 
                 bool isOpen = magtekService.IsDeviceOpened() && magtekService.IsDeviceConnected();
-                State = isOpen ? MTConnectionState.Connected : MTConnectionState.Disconnected;
+                //State = isOpen ? MTConnectionState.Connected : MTConnectionState.Disconnected;
                 return isOpen;
             }
             catch (Exception ex)
