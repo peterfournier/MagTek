@@ -1,7 +1,7 @@
-﻿using XFMagTek.Enums;
-using System;
+﻿using System;
+using Xamarin.Forms.MagTek.Enums;
 
-namespace XFMagTek.Interfaces.MagTek
+namespace Xamarin.Forms.MagTek.Models
 {
     public interface INSNotificationCenter
     {

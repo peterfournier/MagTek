@@ -5,10 +5,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Xamarin.Forms;
+using Xamarin.Forms.MagTek.Enums;
+using Xamarin.Forms.MagTek.Models;
 using Xamarin.Forms.Xaml;
-using XFMagTek.Enums;
-using XFMagTek.Interfaces.MagTek;
-using XFMagTek.Models.MagTek;
 using XFMagTek.ViewModels;
 
 namespace XFMagTek.Views
@@ -84,7 +83,7 @@ namespace XFMagTek.Views
         {
             if (!IsDeviceRegistered(SelectedDevice))
             {
-                if (SelectedDevice.DeviceType == MTDeviceType.MAGTEKIDYNAMO)
+                if (SelectedDevice.DeviceType == DeviceType.MAGTEKIDYNAMO)
                 {
                     string deviceSerial = _cardReaderService.MagTekDeviceSerial();
 
@@ -99,14 +98,14 @@ namespace XFMagTek.Views
             IsBusy = true;
             if (SelectedDevice != null)
             {                
-                await SelectedDevice.ConnectToDevice(_cardReaderService);
+                SelectedDevice.TryToConnectToDevice();
             }
         }, () => !IsBusy);
         public ICommand DisconnectDevice => new Command(async () =>
         {
             IsBusy = true;
             if (SelectedDevice != null)
-                await SelectedDevice.DisconnectDevice(_cardReaderService);
+                SelectedDevice.DisconnectDevice();
             UpdateDeviceState();
             IsBusy = false;
         }, () => !IsBusy);
@@ -189,7 +188,7 @@ namespace XFMagTek.Views
             try
             {
                 // set device type we're searching for
-                _cardReaderService.SetDeviceType((int)MTDeviceType.MAGTEKEDYNAMO);
+                _cardReaderService.SetDeviceType((int)DeviceType.MAGTEKEDYNAMO);
                 await Task.Delay(500); // little hack since this services aren't async
 
                 // start scanning
@@ -208,7 +207,7 @@ namespace XFMagTek.Views
                     }
                     if (!IsDeviceAdded(item))
                     {
-                        item.DeviceType = MTDeviceType.MAGTEKEDYNAMO;
+                        item.DeviceType = DeviceType.MAGTEKEDYNAMO;
                         if (item is IMagTekDevice)
                         {
                             DevicesList.Add(item);
@@ -266,9 +265,9 @@ namespace XFMagTek.Views
                 SelectedDevice = device;
             }
         }
-        public async Task StartAddNewDeviceFlow(MTDeviceType selectedMtDevice)
+        public async Task StartAddNewDeviceFlow(DeviceType selectedMtDevice)
         {
-            if (selectedMtDevice == MTDeviceType.MAGTEKEDYNAMO)
+            if (selectedMtDevice == DeviceType.MAGTEKEDYNAMO)
             {
                 await ExecuteScanCommand();
             }
@@ -277,7 +276,7 @@ namespace XFMagTek.Views
                 var newIdynamo = new MagTekDevice()
                 {
                     DeviceType = selectedMtDevice,
-                    State = MTConnectionState.Disconnected,
+                    State = ConnectionState.Disconnected,
                     Name = "iDynamo"
                 };
                 DevicesList.Add(newIdynamo);
@@ -289,23 +288,23 @@ namespace XFMagTek.Views
         {
             switch (SelectedDevice?.State)
             {
-                case MTConnectionState.Error:
+                case ConnectionState.Error:
                     MagTekDeviceStateColor = Color.Maroon;
                     ConnectionStatus = "Something went wrong please try again.";
                     IsBusy = false;
                     break;
-                case MTConnectionState.Connected:
+                case ConnectionState.Connected:
                     MagTekDeviceStateColor = Color.Green;
                     ConnectionStatus = "Your device is ready to use.";
                     IsBusy = false;
                     break;
-                case MTConnectionState.Connecting:
+                case ConnectionState.Connecting:
                     ConnectionStatus = "Attempting to connect...";
                     MagTekDeviceStateColor = Color.Blue;
                     IsBusy = true;
                     break;
-                case MTConnectionState.Disconnecting:
-                case MTConnectionState.Disconnected:
+                case ConnectionState.Disconnecting:
+                case ConnectionState.Disconnected:
                 default:
                     MagTekDeviceStateColor = Color.Gold;
                     ConnectionStatus = "Device not Connected";
@@ -319,34 +318,12 @@ namespace XFMagTek.Views
             }
             SetDeviceInfo();
         }
-        private void WireUpCardReaderEvents()
-        {
-            try
-            {
-                _cardReaderService.OnCardSwipeDidStartDelegate -= _cardReaderService_OnCardSwipeDidStartDelegate;
-                _cardReaderService.OnDataReceivedDelegate -= _cardReaderService_OnDataReceivedDelegate;
-                _cardReaderService.OnDeviceConnectionDidChangeDelegate -= _cardReaderService_OnDeviceConnectionDidChangeDelegate;
-                _cardReaderService.OnDeviceErrorDelegate -= _cardReaderService_OnDeviceErrorDelegate;
-                //_cardReaderService.OnBleReaderStateUpdatedDelegate -= _cardReaderService_OnBleReaderStateUpdatedDelegate;
-
-
-                //_cardReaderService.OnBleReaderStateUpdatedDelegate += _cardReaderService_OnBleReaderStateUpdatedDelegate;
-                _cardReaderService.OnCardSwipeDidStartDelegate += _cardReaderService_OnCardSwipeDidStartDelegate;
-                _cardReaderService.OnDataReceivedDelegate += _cardReaderService_OnDataReceivedDelegate;
-                _cardReaderService.OnDeviceConnectionDidChangeDelegate += _cardReaderService_OnDeviceConnectionDidChangeDelegate;
-                _cardReaderService.OnDeviceErrorDelegate += _cardReaderService_OnDeviceErrorDelegate;
-            }
-            catch (Exception ex)
-            {
-                throw;
-            }
-        }
-
+        
         private void _cardReaderService_OnBleReaderStateUpdatedDelegate(int state)
         {
             if (SelectedDevice != null)
             {
-                SelectedDevice.State = (MTConnectionState)state;
+                SelectedDevice.State = (ConnectionState)state;
                 UpdateDeviceState();
             }
         }
@@ -356,7 +333,7 @@ namespace XFMagTek.Views
             // disconnect device
             try
             {
-                await SelectedDevice?.DisconnectDevice(_cardReaderService);
+                SelectedDevice?.DisconnectDevice();
                 UpdateDeviceState();
             }
             catch (Exception ex)
@@ -384,7 +361,7 @@ namespace XFMagTek.Views
                 DataResponse = string.Empty;
                 if (SelectedDevice.IsDeviceRegisteredToHost)
                 {
-                    await SelectedDevice.ConnectToDevice(_cardReaderService);
+                    SelectedDevice.TryToConnectToDevice();
                 }
                 UpdateDeviceState();
             }
@@ -395,70 +372,18 @@ namespace XFMagTek.Views
             DeviceInfo += Environment.NewLine;
             DeviceInfo += $"Is Connected: {_cardReaderService.IsDeviceConnected()}";
             DeviceInfo += Environment.NewLine;
-            DeviceInfo += $"Device type: {_cardReaderService.DeviceType()} = {((MTDeviceType)_cardReaderService.DeviceType()).ToString()}";
+            DeviceInfo += $"Device type: {_cardReaderService.DeviceType()} = {((DeviceType)_cardReaderService.DeviceType()).ToString()}";
             DeviceInfo += Environment.NewLine;
-            DeviceInfo += $"Connection Type: {_cardReaderService.ConnectionType()} = {((MTConnectionType)_cardReaderService.ConnectionType()).ToString()}";
+            DeviceInfo += $"Connection Type: {_cardReaderService.ConnectionType()} = {((ConnectionType)_cardReaderService.ConnectionType()).ToString()}";
             DeviceInfo += Environment.NewLine;
             DeviceInfo += $"Additional Info: {additionalInfo}";
         }
 
         #region events      
-        private void _cardReaderService_OnDeviceErrorDelegate(INSError error)
-        {
-            try
-            {
-                SetDeviceInfo(JsonConvert.SerializeObject(error));
-            }
-            catch (Exception)
-            {
-                //DataResponse = $"Message: {ex.Message}{Environment.NewLine} Stacktrace: {ex.StackTrace}";
-            }
-        }
-        private void _cardReaderService_OnDeviceConnectionDidChangeDelegate(int deviceType, bool connected, object instance, MTConnectionState state)
-        {
-            try
-            {
-                DataResponse = string.Empty;
-                if (SelectedDevice != null)
-                {
-                    SelectedDevice.State = state;
-                    UpdateDeviceState();
-                }
-            }
-            catch (Exception)
-            {
-                if (SelectedDevice != null)
-                    SelectedDevice.State = MTConnectionState.Error;
-            }
-        }
-        private void _cardReaderService_OnDataReceivedDelegate(IMTCardData cardDataObj, object instance)
-        {
-            try
-            {
-                DataResponse = "Data recieved. Your device is working correctly and is ready for use.";
-                DataResponse += $"CardDataObj: {JsonConvert.SerializeObject(cardDataObj, Formatting.Indented, new JsonSerializerSettings() { ReferenceLoopHandling = ReferenceLoopHandling.Ignore })}";
-                DataResponse += Environment.NewLine;
-                DataResponse += $"InstanceObj: {JsonConvert.SerializeObject(instance, Formatting.Indented, new JsonSerializerSettings() { ReferenceLoopHandling = ReferenceLoopHandling.Ignore })}";
-            }
-            catch (Exception ex)
-            {
-                DataResponse = $"Message: {ex.Message}{Environment.NewLine} Stacktrace: {ex.StackTrace}";
-            }
-        }
-        private void _cardReaderService_OnCardSwipeDidStartDelegate(object instance)
-        {
-            try
-            {
-                DataResponse = "Swiped...";
-                DataResponse = $"_cardReaderService_OnCardSwipeDidStartDelegate: {instance}";
-                DataResponse += Environment.NewLine;
-            }
-            catch (Exception ex)
-            {
-                DataResponse = $"Message: {ex.Message}{Environment.NewLine} Stacktrace: {ex.StackTrace}";
-                DataResponse = $"Message: {ex.Message}{Environment.NewLine} Stacktrace: {ex.StackTrace}";
-            }
-        }
+        
+        
+        
+        
         private async void EDynamoDeviceSetupViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(SelectedDevice))

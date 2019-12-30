@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace XFMagTek.Interfaces.MagTek
+namespace Xamarin.Forms.MagTek.Models
 {
     public interface INSError
     {

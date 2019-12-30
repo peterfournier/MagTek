@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using XFMagTek.Delegates.MagTek;
+using Xamarin.Forms.MagTek.Delegates.MagTek;
 
-namespace XFMagTek.Interfaces.MagTek
+namespace Xamarin.Forms.MagTek.Models
 {
     public interface IeDynamoService
     {

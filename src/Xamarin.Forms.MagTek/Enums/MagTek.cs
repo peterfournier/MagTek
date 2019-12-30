@@ -1,6 +1,6 @@
-﻿namespace XFMagTek.Enums
+﻿namespace Xamarin.Forms.MagTek.Enums
 {
-    public enum MTConnectionState
+    public enum ConnectionState
     {
         Disconnected = 0,
         Connecting = 1,
@@ -12,7 +12,7 @@
         // jumping to 101 to avoid conflicts
         DeviceReadyToPair = 101
     }
-    public enum MTConnectionType
+    public enum ConnectionType
     {
         Audio = 0,
         BLE = 1,
@@ -22,7 +22,7 @@
         Lightning = 5
     }
 
-    public enum MTDeviceType
+    public enum DeviceType
     {
         MAGTEKAUDIOREADER, //iOS Only
         MAGTEKIDYNAMO,

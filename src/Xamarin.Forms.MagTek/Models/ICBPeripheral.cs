@@ -1,11 +1,11 @@
-﻿using XFMagTek.Enums;
+﻿using Xamarin.Forms.MagTek.Enums;
 
-namespace XFMagTek.Interfaces.MagTek
+namespace Xamarin.Forms.MagTek.Models
 {
     public interface ICBPeripheral
     {
         string Name { get; }
         string RSSIstringValue { get; }
-        MTConnectionState State { get; }
+        ConnectionState State { get; }
     }
 }

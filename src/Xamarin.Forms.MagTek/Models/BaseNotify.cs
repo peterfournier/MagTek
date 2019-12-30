@@ -2,9 +2,9 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace XFMagTek.Models
+namespace Xamarin.Forms.MagTek.Models
 {
-    public class BaseNotify : INotifyPropertyChanged
+    internal abstract class BaseNotify : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -29,7 +29,7 @@ namespace XFMagTek.Models
 
             currentValue = newValue;
 
-            var dirty = sender as XFMagTek.Interfaces.IDirty;
+            var dirty = sender as Xamarin.Forms.MagTek.Models.IDirty;
 
             if (dirty != null)
                 dirty.IsDirty = true;

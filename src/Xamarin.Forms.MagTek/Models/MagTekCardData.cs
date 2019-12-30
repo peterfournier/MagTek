@@ -1,6 +1,4 @@
-﻿using XFMagTek.Interfaces.MagTek;
-
-namespace XFMagTek.Models.MagTek
+﻿namespace Xamarin.Forms.MagTek.Models
 {
     public class MagTekCardData : IMTCardData
     {

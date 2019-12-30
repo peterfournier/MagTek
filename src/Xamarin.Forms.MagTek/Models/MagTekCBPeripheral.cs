@@ -1,22 +1,20 @@
-﻿using XFMagTek.Enums;
-using XFMagTek.Interfaces.MagTek;
-using System;
+﻿using Xamarin.Forms.MagTek.Enums;
 
-namespace XFMagTek.Models.MagTek
+namespace Xamarin.Forms.MagTek.Models
 {
     public class MagTekCBPeripheral : ICBPeripheral
     {
         private readonly string _name;
         private readonly string _rssIsStringValue;
-        private readonly MTConnectionState _state;
+        private readonly ConnectionState _state;
 
         public string Name => _name;
 
         public string RSSIstringValue => _rssIsStringValue;
 
-        public MTConnectionState State => _state;
+        public ConnectionState State => _state;
 
-        public MagTekCBPeripheral(string name, string rssIsStringValue, MTConnectionState state)
+        public MagTekCBPeripheral(string name, string rssIsStringValue, ConnectionState state)
         {
             _name = name;
             _rssIsStringValue = rssIsStringValue;

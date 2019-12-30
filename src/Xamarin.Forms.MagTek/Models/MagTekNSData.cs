@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using XFMagTek.Interfaces.MagTek;
-
-namespace XFMagTek.Models.MagTek
+﻿namespace Xamarin.Forms.MagTek.Models
 {
     public class MagTekNSData : INSData
     {
