@@ -11,13 +11,10 @@ namespace Xamarin.MagTek.Forms
             string address,
             DeviceType deviceType,
             string id,
-            string name
+            string name,
+            Bond bond
             );
-        ObservableCollection<IMagTekDevice> FoundDevices { get; set; }
-        ObservableCollection<IMagTekDevice> RegisteredDevices { get; set; }
-        ObservableCollection<IMagTekDevice> ConnectedDevices();
+        ObservableCollection<IMagTekDevice> Devices { get; set; }
         Task ScanForDevicesCommand();
-        void RegisterDevice(IMagTekDevice device);
-        void UnRegisterDevice(IMagTekDevice device);
     }
 }

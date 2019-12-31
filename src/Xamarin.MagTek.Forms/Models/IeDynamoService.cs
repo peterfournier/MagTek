@@ -4,8 +4,7 @@ using Xamarin.MagTek.Forms.Delegates;
 namespace Xamarin.MagTek.Forms.Models
 {
     public interface IeDynamoService
-    {
-        bool CreateBond(string address);
+    {        
         bool CloseDevice();
         bool IsDeviceConnected();
         bool IsDeviceEMV();
@@ -29,6 +28,7 @@ namespace Xamarin.MagTek.Forms.Models
         event OnTransactionResultDelegate OnTransactionResultDelegate;
         event OnTransactionStatusDelegate OnTransactionStatusDelegate;
         event OnUserSelectionRequestDelegate OnUserSelectionRequestDelegate;
+        event OnBlueToothBondChangedDelegate OnBlueToothBondChangedDelegate;
         ICollection<IDiscoveredDevice> GetDiscoveredPeripherals();
         int CancelTransaction();
         int CardPANLength();
@@ -88,6 +88,7 @@ namespace Xamarin.MagTek.Forms.Models
         string Track3Masked();
         string TrackDecodeStatus();
         void ClearBuffers();
+        void CreateBond(string address);
         void ListenForEvents(int @event);
         void RequestDeviceList(int type);        
         void SetConfigurationParams(string pData);

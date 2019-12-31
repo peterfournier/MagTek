@@ -44,6 +44,7 @@ namespace XFMagTek.Droid
         public event OnTransactionResultDelegate OnTransactionResultDelegate;
         public event OnTransactionStatusDelegate OnTransactionStatusDelegate;
         public event OnUserSelectionRequestDelegate OnUserSelectionRequestDelegate;
+        public event OnBlueToothBondChangedDelegate OnBlueToothBondChangedDelegate;
 
         public MTSCRA_Service_droid()
         {
@@ -57,6 +58,15 @@ namespace XFMagTek.Droid
             MagTekApi.MTSCRA_delegates.OnDeviceConnectionDidChangeDelegate += MTSCRA_delegates_OnDeviceConnectionDidChangeDelegate;
             MagTekApi.MTSCRA_delegates.OnDeviceResponseDelegate += MTSCRA_delegates_OnDeviceResponseDelegate;
             MagTekApi.MTSCRA_delegates.OnBleReaderDidDiscoverPeripheralDelegate += MTSCRA_delegates_OnBleReaderDidDiscoverPeripheralDelegate;
+        }
+
+        ~MTSCRA_Service_droid()
+        {
+            MagTekApi.MTSCRA_delegates.OnCardDataStateChangedDelegate -= MTSCRA_delegates_OnCardDataStateChangedDelegate;
+            MagTekApi.MTSCRA_delegates.OnDataReceivedDelegate -= MTSCRA_delegates_OnDataReceivedDelegate;
+            MagTekApi.MTSCRA_delegates.OnDeviceConnectionDidChangeDelegate -= MTSCRA_delegates_OnDeviceConnectionDidChangeDelegate;
+            MagTekApi.MTSCRA_delegates.OnDeviceResponseDelegate -= MTSCRA_delegates_OnDeviceResponseDelegate;
+            MagTekApi.MTSCRA_delegates.OnBleReaderDidDiscoverPeripheralDelegate -= MTSCRA_delegates_OnBleReaderDidDiscoverPeripheralDelegate;
         }
 
         public long BatteryLevel()
@@ -328,51 +338,19 @@ namespace XFMagTek.Droid
             return _cardReader.SetAcquirerResponse(array);
         }
 
-        public bool CreateBond(string address)
+        public void CreateBond(string address)
         {
             _cardReader.SetAddress(address);
-            //_cardReader.SetConnectionType(MTConnectionType.Bluetooth);
+
             var device = _bluetoothAdapter.GetRemoteDevice(address);
+
             IntentFilter filter = new IntentFilter(BluetoothDevice.ActionBondStateChanged);
-            myBroadCastReciever = new MyBroadCastReciever();
+            var myBroadCastReciever = new MyBroadCastReciever();
+            myBroadCastReciever.BondChanged += OnBlueToothBondChangedDelegate_eventHandler;
             Android.App.Application.Context.RegisterReceiver(myBroadCastReciever, filter);
 
-            // Need to unregister if it fails
-
-            return device.CreateBond();
+            device.CreateBond();
         }
-        private MyBroadCastReciever myBroadCastReciever;
-        private class MyBroadCastReciever : BroadcastReceiver
-        {
-            public override void OnReceive(Context context, Intent intent)
-            {
-                string action = intent.Action;
-
-                if (intent.Action.Equals(BluetoothDevice.ActionBondStateChanged))
-                {
-                    int state = intent.GetIntExtra(BluetoothDevice.ExtraBondState, BluetoothDevice.Error);
-
-                    switch (state)
-                    {
-                        case (int)Bond.Bonding:
-                            // Bonding...
-                            break;
-
-                        case (int)Bond.Bonded:
-                            // Bonded...
-
-                            Android.App.Application.Context.UnregisterReceiver(this);
-                            break;
-
-                        case (int)Bond.None:
-                            // Not bonded...
-                            Android.App.Application.Context.UnregisterReceiver(this);
-                            break;
-                    }
-                }
-            }
-        }
-
 
         public void SetConfigurationParams(string pData)
         {
@@ -581,6 +559,18 @@ namespace XFMagTek.Droid
         {
 
         }
+
+        private void OnBlueToothBondChangedDelegate_eventHandler(object sender, Bond bond)
+        {
+            OnBlueToothBondChangedDelegate?.Invoke(ConversionHelper.GetBondState(bond));
+
+            if (sender is MyBroadCastReciever broadCastReciever)
+            {
+                // Okay, disabling the unsubscribe because if the user disconnects from the settings and returns the app, it get's out of sync, what happens with multiple??.
+                //if (bond != Bond.Bonding)
+                //    broadCastReciever.BondChanged-= OnBlueToothBondChangedDelegate_eventHandler;
+            }
+        }
         #endregion
 
 
@@ -702,6 +692,37 @@ namespace XFMagTek.Droid
         //    }
         //}
 
+        //delegate void BondChangedDelegate(MyBroadCastReciever sender, Bond bond);
+
+        class MyBroadCastReciever : BroadcastReceiver
+        {
+            public event EventHandler<Bond> BondChanged;
+
+            public override void OnReceive(Context context, Intent intent)
+            {
+                string action = intent.Action;
+
+                if (intent.Action.Equals(BluetoothDevice.ActionBondStateChanged))
+                {
+                    int state = intent.GetIntExtra(BluetoothDevice.ExtraBondState, BluetoothDevice.Error);
+
+                    switch (state)
+                    {
+                        case (int)Bond.Bonding:
+                            break;
+                        case (int)Bond.Bonded:
+                        case (int)Bond.None:
+                        default:
+                            // Okay, disabling the unsubscribe because if the user disconnects from the settings and returns the app, it get's out of sync, what happens with multiple??.
+                            //Android.App.Application.Context.UnregisterReceiver(this);
+                            break;
+                    }
+
+                    BondChanged?.Invoke(this, (Bond)state);
+                }
+            }
+        }
+
         class MyLeScanCallBack : Java.Lang.Object, ILeScanCallback
         {
             public List<IDiscoveredDevice> DevicesFound { get; set; } = new List<IDiscoveredDevice>();
@@ -727,37 +748,25 @@ namespace XFMagTek.Droid
                     && existingDevice == null
                     )
                 {
-                    DevicesFound.Add(new DiscoveredDevice()
+                    var newDevice = new DiscoveredDevice()
                     {
                         Address = device.Address,
                         DeviceType = device.Type == BluetoothDeviceType.Unknown ? Xamarin.MagTek.Forms.Enums.DeviceType.MAGTEKNONE : Xamarin.MagTek.Forms.Enums.DeviceType.MAGTEKEDYNAMO,
                         Id = device.Address,
                         Name = device.Name,
-                        Bond = getBondState(device.BondState)
-                    }); ;
+                        Bond = ConversionHelper.GetBondState(device.BondState)
+                    };
+                    DevicesFound.Add(newDevice);
                 }
                 else if (existingDevice != null)
                 {
-                    existingDevice.Bond = getBondState(device.BondState);
+                    existingDevice.Bond = ConversionHelper.GetBondState(device.BondState);
                 }
             }
 
-            private Xamarin.MagTek.Forms.Enums.Bond getBondState(Android.Bluetooth.Bond bondState)
-            {
-                switch (bondState)
-                {
-                    case Bond.Bonded:
-                        return Xamarin.MagTek.Forms.Enums.Bond.Bonded;
-                    case Bond.Bonding:
-                        return Xamarin.MagTek.Forms.Enums.Bond.Bonding;
-                    case Bond.None:
-                        return Xamarin.MagTek.Forms.Enums.Bond.None;
-                    default:
-                        throw new ArgumentOutOfRangeException(nameof(bondState), $"BondState {bondState} is not handled.");
-                }
-            }
         }
         #endregion
+        
 
     }
 
@@ -772,7 +781,7 @@ namespace XFMagTek.Droid
         {
             MTSCRA = new MTSCRA(_context, new Handler(MTSCRA_delegates));
             BluetoothAdapter = BluetoothAdapter.DefaultAdapter;
-            // is bluetooth enabled?
+            
             if (!BluetoothAdapter.IsEnabled)
             {
                 BluetoothAdapter.Enable();
@@ -801,6 +810,21 @@ namespace XFMagTek.Droid
         {
             byte[] array = new byte[1] { @this };
             return array;
+        }
+
+        public static Xamarin.MagTek.Forms.Enums.Bond GetBondState(Bond bondState)
+        {
+            switch (bondState)
+            {
+                case Bond.Bonded:
+                    return Xamarin.MagTek.Forms.Enums.Bond.Bonded;
+                case Bond.Bonding:
+                    return Xamarin.MagTek.Forms.Enums.Bond.Bonding;
+                case Bond.None:
+                    return Xamarin.MagTek.Forms.Enums.Bond.None;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(bondState), $"BondState {bondState} is not handled.");
+            }
         }
     }
 }

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.ObjectModel;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Xamarin.Forms;
@@ -79,20 +78,20 @@ namespace XFMagTek.Views
                 SetProperty(ref _magTekDeviceStateColor, value);
             }
         }
-        public ICommand OnRegisterDeviceTapCommand => new Command(() =>
-        {
-            if (SelectedDevice.IsDeviceRegisteredToClient == false)
-            {
-                if (SelectedDevice.DeviceType == DeviceType.MAGTEKIDYNAMO)
-                {
-                    string deviceSerial = _cardReaderService.MagTekDeviceSerial();
+        //public ICommand OnRegisterDeviceTapCommand => new Command(() =>
+        //{
+        //    if (SelectedDevice.IsDeviceRegisteredToClient == false)
+        //    {
+        //        if (SelectedDevice.DeviceType == DeviceType.MAGTEKIDYNAMO)
+        //        {
+        //            string deviceSerial = _cardReaderService.MagTekDeviceSerial();
 
-                    SelectedDevice.Name = !string.IsNullOrWhiteSpace(deviceSerial) ? $"iDynamo - {deviceSerial}" : "iDynamo";
-                    SelectedDevice.Id = deviceSerial;
-                }
-                MagTekFactory.RegisterDevice(SelectedDevice);
-            }
-        }, () => !IsBusy);
+        //            SelectedDevice.Name = !string.IsNullOrWhiteSpace(deviceSerial) ? $"iDynamo - {deviceSerial}" : "iDynamo";
+        //            SelectedDevice.Id = deviceSerial;
+        //        }
+        //        MagTekFactory.RegisterDevice(SelectedDevice);
+        //    }
+        //}, () => !IsBusy);
         public ICommand ConnectToDeviceCommand => new Command(() =>
         {
             IsBusy = true;
@@ -265,10 +264,10 @@ namespace XFMagTek.Views
         public void Initialize()
         {
             PropertyChanged += EDynamoDeviceSetupViewModel_PropertyChanged;
-            MagTekFactory.FoundDevices.CollectionChanged += (sender, args) =>
+            MagTekFactory.Devices.CollectionChanged += (sender, args) =>
             {
                 FoundDevices.Clear();
-                foreach (var device in MagTekFactory.FoundDevices)
+                foreach (var device in MagTekFactory.Devices)
                 {
                     FoundDevices.Add(device);
                     DataResponse = FoundDevices.Count.ToString();
@@ -280,18 +279,18 @@ namespace XFMagTek.Views
             UpdateShowDevicesMessage();
             //UpdateDeviceState();
         }
-        private async Task HandleSelectedDeviceChanged()
-        {
-            if (SelectedDevice != null)
-            {
-                IsBusy = true;
-                CloseAnyExistingConnections();
-                if (SelectedDevice.IsDeviceRegisteredToClient)
-                {
-                    SelectedDevice.TryToConnectToDevice();
-                }
-            }
-        }
+        //private async Task HandleSelectedDeviceChanged()
+        //{
+        //    if (SelectedDevice != null)
+        //    {
+        //        IsBusy = true;
+        //        CloseAnyExistingConnections();
+        //        if (SelectedDevice.IsDeviceRegisteredToClient)
+        //        {
+        //            SelectedDevice.TryToConnectToDevice();
+        //        }
+        //    }
+        //}
         //private void SetDeviceInfo(string additionalInfo = "")
         //{
         //    DeviceInfo = $"Is Open: {_cardReaderService.IsDeviceOpened()}";
@@ -336,7 +335,18 @@ namespace XFMagTek.Views
                 case ConnectionState.Disconnected:
                 case ConnectionState.Disconnecting:
                 default:
-                    MagTekDeviceStateColor = Color.Gold;
+                    if (SelectedDevice.Bond == Bond.Bonding)
+                    {
+                        MagTekDeviceStateColor = Color.Blue;
+                    }
+                    else if (SelectedDevice.Bond == Bond.Bonded)
+                    {
+                        MagTekDeviceStateColor = Color.Gold;
+                    }
+                    else
+                    {
+                        MagTekDeviceStateColor = Color.LightGray;
+                    }
                     break;
             }
 

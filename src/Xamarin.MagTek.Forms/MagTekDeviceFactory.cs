@@ -9,8 +9,7 @@ namespace Xamarin.MagTek.Forms
 {
     public class MagTekDeviceFactory : IMagTekFactoryService
     {
-        public ObservableCollection<IMagTekDevice> FoundDevices { get; set; } = new ObservableCollection<IMagTekDevice>();
-        public ObservableCollection<IMagTekDevice> RegisteredDevices { get; set; } = new ObservableCollection<IMagTekDevice>();
+        public ObservableCollection<IMagTekDevice> Devices { get; set; } = new ObservableCollection<IMagTekDevice>();
         public IeDynamoService MagtekService { get; private set; }
 
         #region Con/De structors
@@ -27,39 +26,11 @@ namespace Xamarin.MagTek.Forms
 
 
         #region Public Methods
-        private bool IsDeviceRegistered(IMagTekDevice device)
-        {
-            return RegisteredDevices.Any(x => x.Id == device.Id) || RegisteredDevices.Any(x => x.Name == device.Name);
-        }
         private bool IsDeviceAdded(IMagTekDevice device)
         {
-            return FoundDevices.Any(x => x.Id == device.Id) || FoundDevices.Any(x => x.Name == device.Name);
+            return Devices.Any(x => x.Id == device.Id) || Devices.Any(x => x.Name == device.Name);
         }
-        public void RegisterDevice(IMagTekDevice device)
-        {
-            if (device == null || device.IsDeviceRegisteredToClient || device.IsDeviceIsAlreadyConnected() == false) return;
-
-            RegisteredDevices.Add(device);
-            device.IsDeviceRegisteredToClient = true;
-        }
-        public void UnRegisterDevice(IMagTekDevice device)
-        {
-            if (device == null) return;
-
-            device.DisconnectDevice();
-            RegisteredDevices.Remove(device);
-            device.IsDeviceRegisteredToClient = false;
-        }
-        public ObservableCollection<IMagTekDevice> ConnectedDevices()
-        {
-            var connectedDevices = new ObservableCollection<IMagTekDevice>();
-            var list = RegisteredDevices.Where(x => x.IsDeviceIsAlreadyConnected());
-            foreach (var i in list)
-            {
-                connectedDevices.Add(i);
-            }
-            return connectedDevices;
-        }
+      
         public async Task ScanForDevicesCommand()
         {
             try
@@ -75,18 +46,13 @@ namespace Xamarin.MagTek.Forms
 
                 foreach (var discoveredDevice in discoveredMagTekDevices)
                 {
-                    var mtDevice = CreateDevice(discoveredDevice.Address, discoveredDevice.DeviceType, discoveredDevice.Id, discoveredDevice.Name);
-
-                    if (IsDeviceRegistered(mtDevice))
-                    {
-                        mtDevice.IsDeviceRegisteredToClient = true;
-                    }
+                    var mtDevice = CreateDevice(discoveredDevice.Address, discoveredDevice.DeviceType, discoveredDevice.Id, discoveredDevice.Name, discoveredDevice.Bond);
 
                     if (!IsDeviceAdded(mtDevice))
                     {
                         if (mtDevice is IMagTekDevice)
                         {
-                            FoundDevices.Add(mtDevice);
+                            Devices.Add(mtDevice);
                         }
                     }
                 }
@@ -106,7 +72,8 @@ namespace Xamarin.MagTek.Forms
             string address,
             DeviceType deviceType,
             string id,
-            string name
+            string name,
+            Bond bond
             )
         {
             switch (deviceType)
@@ -118,7 +85,7 @@ namespace Xamarin.MagTek.Forms
                 case DeviceType.MAGTEKDYNAMAX:
                     return new Dynamax(MagtekService, address, id, name);
                 case DeviceType.MAGTEKEDYNAMO:
-                    return new EDynamo(MagtekService, address, id, name);
+                    return new EDynamo(MagtekService, address, id, name, bond);
                 case DeviceType.MAGTEKUSBMSR:
                     return new USBMsr(MagtekService, address, id, name);
                 case DeviceType.MAGTEKKDYNAMO:

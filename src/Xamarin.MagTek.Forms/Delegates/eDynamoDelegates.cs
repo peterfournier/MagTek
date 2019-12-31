@@ -22,4 +22,5 @@ namespace Xamarin.MagTek.Forms.Delegates
     public delegate void OnTransactionStatusDelegate(INSData data);
     public delegate void OnUserSelectionRequestDelegate(INSData data);
     public delegate void OnDataEvent(MTSCRATransactionStatus status);
+    public delegate void OnBlueToothBondChangedDelegate(Bond bond);
 }

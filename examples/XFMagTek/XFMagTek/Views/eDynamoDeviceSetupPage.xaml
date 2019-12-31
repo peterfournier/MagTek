@@ -91,7 +91,7 @@
                     <ListView
                         IsVisible="{Binding Scanning, Converter={x:Static utils:Converters.InverseBoolConverter}}"
                         RowHeight="50"
-                        ItemsSource="{Binding MagTekFactory.FoundDevices}"
+                        ItemsSource="{Binding MagTekFactory.Devices}"
                         SelectedItem="{Binding SelectedDevice, Mode=TwoWay}"
                         HeightRequest="180"
                         >
@@ -107,6 +107,7 @@
                                         </Grid.ColumnDefinitions>
                                         <Grid.RowDefinitions>
                                             <RowDefinition Height="*" />
+                                            <RowDefinition Height="*" />
                                             <RowDefinition Height="1" />
                                         </Grid.RowDefinitions>
 
@@ -118,9 +119,18 @@
                                             Text="{Binding Name}" 
                                             VerticalTextAlignment="Center"
                                             />
-                                        
+
+                                        <Label 
+                                            Grid.Column="1" 
+                                            Grid.Row="1"
+                                            LineBreakMode="NoWrap"
+                                            Style="{StaticResource s1Label}"
+                                            Text="{Binding GroupingLetter}" 
+                                            VerticalTextAlignment="Center"
+                                            />
+
                                         <StackLayout 
-                                            Grid.Row="1" 
+                                            Grid.Row="2" 
                                             Grid.ColumnSpan="2"
                                             BackgroundColor="Gray" 
                                             HeightRequest="1"/>
@@ -185,9 +195,10 @@
                                 ></Label>
 
 
+                        <!--IsVisible="{Binding SelectedDevice.Bond, 
+                            Converter={x:Static utils:Converters.StringsAreEqualToBoolConverter},
+                            ConverterParameter={x:Static enums:Bond.None }}"-->
                         <StackLayout
-                                IsVisible="{Binding SelectedDevice.IsDeviceRegisteredToHost, 
-                                    Converter={x:Static utils:Converters.InverseBoolConverter}}"
                                 Spacing="0">
                             <Label 
                                     LineBreakMode="WordWrap"
@@ -204,33 +215,34 @@
                             <Label 
                                     LineBreakMode="WordWrap"
                                     Style="{StaticResource s1Label}" 
-                                    Text="3.  Once the blue LED flashes, press Connect button below."
+                                    Text="3.  Once the blue LED flashes, press the Pair button below."
                                     ></Label>
 
                             <Label 
                                     FontAttributes="Bold"
                                     LineBreakMode="WordWrap"
                                     Style="{StaticResource s1Label}" 
-                                    Text="4. Enter six zeros for default pairing code if prompted."
+                                    Text="4. Enter six zeros for default pairing code."
                                     ></Label>
                             <Label 
                                     FontAttributes="Bold"
                                     LineBreakMode="WordWrap"
                                     Style="{StaticResource s1Label}" 
-                                    Text="5. Once connected, click Register this Device."
+                                    Text="5. Once paired, click Connect."
                                     ></Label>
                         </StackLayout>
 
+                        <!--pair-->
                         <StackLayout
                                 Orientation="Horizontal"
-                                IsVisible="{Binding SelectedDevice.State, 
+                                IsVisible="{Binding SelectedDevice.Bond, 
                                     Converter={x:Static utils:Converters.StringsAreEqualToBoolConverter},
-                                    ConverterParameter={x:Static enums:ConnectionState.Disconnected }}"
+                                    ConverterParameter={x:Static enums:Bond.None }}"
                                 >
                             <Button
                                     IsVisible="{Binding IsBusy, Converter={x:Static utils:Converters.InverseBoolConverter}}"
                                     Command="{Binding ConnectToDeviceCommand}"
-                                    Text="Connect"
+                                    Text="Pair Device"
                                     HorizontalOptions="Start">
                             </Button>
 
@@ -240,19 +252,6 @@
                                     Style="{StaticResource s1Activity}"
                                     HorizontalOptions="Start"
                                     ></ActivityIndicator>
-                        </StackLayout>
-
-                        <StackLayout
-                                IsVisible="{Binding SelectedDevice.State, 
-                                    Converter={x:Static utils:Converters.StringsAreEqualToBoolConverter},
-                                    ConverterParameter={x:Static enums:ConnectionState.Connected }}"
-                                >
-                            <Button
-                                    IsVisible="{Binding IsBusy, Converter={x:Static utils:Converters.InverseBoolConverter}}"
-                                    Command="{Binding DisconnectDevice}"
-                                    Text="Disconnect"
-                                    HorizontalOptions="Start">
-                            </Button>
                         </StackLayout>
 
                         <!--device status indicator-->
@@ -278,15 +277,32 @@
 
                         </StackLayout>
 
+                        <!--connect-->
+                        <StackLayout
+                                IsVisible="{Binding SelectedDevice.Bond, 
+                                    Converter={x:Static utils:Converters.StringsAreEqualToBoolConverter},
+                                    ConverterParameter={x:Static enums:Bond.Bonded }}"
+                                >
+                            <Button
+                                    IsVisible="{Binding SelectedDevice.State, 
+                                        Converter={x:Static utils:Converters.StringsAreEqualToBoolConverter},
+                                        ConverterParameter={x:Static enums:ConnectionState.Disconnected }}"
+                                    Command="{Binding ConnectToDeviceCommand}"
+                                    Text="Connect"
+                                    HorizontalOptions="Start">
+                            </Button>
+                        </StackLayout>
+
+                        <!--disconnect-->
                         <StackLayout
                                 IsVisible="{Binding SelectedDevice.State, 
                                     Converter={x:Static utils:Converters.StringsAreEqualToBoolConverter},
                                     ConverterParameter={x:Static enums:ConnectionState.Connected }}"
                                 >
                             <Button
-                                    IsVisible="{Binding SelectedDevice.IsDeviceRegisteredToHost, Converter={x:Static utils:Converters.InverseBoolConverter}}"
-                                    Command="{Binding OnRegisterDeviceTapCommand}"
-                                    Text="Register this Device"
+                                    IsVisible="{Binding IsBusy, Converter={x:Static utils:Converters.InverseBoolConverter}}"
+                                    Command="{Binding DisconnectDevice}"
+                                    Text="Disconnect"
                                     HorizontalOptions="Start">
                             </Button>
                         </StackLayout>
@@ -303,8 +319,6 @@
                                 Text="{Binding DataResponse}"
                             
                                 ></Label>
-
-
                     </StackLayout>
                 </Frame>
                 <!--idynamo selected-->

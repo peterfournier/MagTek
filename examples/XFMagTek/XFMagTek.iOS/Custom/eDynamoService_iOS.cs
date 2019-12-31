@@ -41,6 +41,7 @@ namespace XFMagTek.iOS
         public event Xamarin.MagTek.Forms.Delegates.OnTransactionResultDelegate OnTransactionResultDelegate;
         public event Xamarin.MagTek.Forms.Delegates.OnTransactionStatusDelegate OnTransactionStatusDelegate;
         public event Xamarin.MagTek.Forms.Delegates.OnUserSelectionRequestDelegate OnUserSelectionRequestDelegate;
+        public event Xamarin.MagTek.Forms.Delegates.OnBlueToothBondChangedDelegate OnBlueToothBondChangedDelegate;
 
         public eDynamoService_iOS()
         {
@@ -418,10 +419,10 @@ namespace XFMagTek.iOS
             _cardReader.RequestDeviceList(type);
         }
 
-        public bool CreateBond(string address)
+        public void CreateBond(string address)
         {
             _cardReader.SetAddress(address);
-            return _cardReader.OpenDevice();
+            //return _cardReader.OpenDevice();
         }
 
         public void SetConfigurationParams(string pData)

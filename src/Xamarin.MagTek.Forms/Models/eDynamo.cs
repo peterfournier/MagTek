@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Xamarin.MagTek.Forms.Enums;
+﻿using Xamarin.MagTek.Forms.Enums;
 
 namespace Xamarin.MagTek.Forms.Models
 {
@@ -13,19 +10,39 @@ namespace Xamarin.MagTek.Forms.Models
         public EDynamo(IeDynamoService magTekService,
             string address,
             string id,
-            string name) : base(magTekService, address, id, name)
+            string name,
+            Bond bond
+            ) : base(magTekService, address, id, name)
         {
+            Bond = bond;
+        }
+
+        ~EDynamo()
+        {
+            MagtekService.OnBlueToothBondChangedDelegate -= MagtekService_OnBlueToothBondChangedDelegate;
         }
 
         public override void TryToConnectToDevice()
         {
             base.TryToConnectToDevice();
 
-            var bonded = MagtekService.CreateBond(Address);
+            MagtekService.CreateBond(Address);
 
-            var opened = MagtekService.OpenDevice();
+            MagtekService.OpenDevice();
 
-            Bond = bonded && opened ? Bond.Bonded : Bond.None;
+            if (Bond == Bond.None)
+                MagtekService.OnBlueToothBondChangedDelegate += MagtekService_OnBlueToothBondChangedDelegate;
+        }
+
+        private void MagtekService_OnBlueToothBondChangedDelegate(Bond bond)
+        {
+            Bond = bond;
+            
+            UpdateDeviceState();
+
+            // Okay, disabling the unsubscribe because if the user disconnects from the settings and returns the app, it get's out of sync, what happens with multiple??.
+            //if (bond != Bond.Bonding)
+            //    MagtekService.OnBlueToothBondChangedDelegate-= MagtekService_OnBlueToothBondChangedDelegate;
         }
     }
 }

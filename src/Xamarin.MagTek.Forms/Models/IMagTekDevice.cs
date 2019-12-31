@@ -7,7 +7,6 @@ namespace Xamarin.MagTek.Forms.Models
 {
     public interface IMagTekDevice : INotifyPropertyChanged
     {
-        bool IsDeviceRegisteredToClient { get; set; }
         ConnectionState State { get; }
         Bond Bond { get; }
         string Address { get; set; }
@@ -20,7 +19,7 @@ namespace Xamarin.MagTek.Forms.Models
         void DisconnectDevice();
         bool IsDeviceIsAlreadyConnected();
         IMTCardData CardData { get; }
-        StringBuilder ConnectionStatusMessage { get; }
+        string ConnectionStatusMessage { get; }
         Action OnCardSwiped { get; set; }
         /// <summary>
         /// IMTCardData cardDataObj, object instance

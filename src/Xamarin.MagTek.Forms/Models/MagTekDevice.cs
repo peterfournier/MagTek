@@ -2,8 +2,6 @@
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Text;
-using System.Windows.Input;
 using Xamarin.Forms;
 using Xamarin.MagTek.Forms.Enums;
 
@@ -17,9 +15,9 @@ namespace Xamarin.MagTek.Forms.Models
         private string _address;
         private int _productId;
         private bool _isDeviceRegisteredToHost;
-        private Bond _bond;
+        private Bond _bond = Bond.None;
         private ConnectionState _state;
-        private StringBuilder _connectionStatusMessaage;
+        private string _connectionStatusMessaage;
 
         public string Id { get { return _id; } set { SetPropertyChanged(ref _id, value, nameof(Id)); } }
         public string Name { get { return _name; } set { SetPropertyChanged(ref _name, value, nameof(Name)); } }
@@ -31,12 +29,14 @@ namespace Xamarin.MagTek.Forms.Models
             set { SetPropertyChanged(ref _bond, value); }
         }
         public ConnectionState State { get { return _state; } private set { SetPropertyChanged(ref _state, value, nameof(State)); } }
-        public bool IsDeviceRegisteredToClient { get { return _isDeviceRegisteredToHost; } set { SetPropertyChanged(ref _isDeviceRegisteredToHost, value, nameof(IsDeviceRegisteredToClient)); } }
-        public string GroupingLetter => IsDeviceRegisteredToClient ? "Registered" : "Not registered";
-        public StringBuilder ConnectionStatusMessage
+        public string GroupingLetter => Bond == Bond.Bonded || State == ConnectionState.Connected ? "Paired" : "Not Paired";
+        public string ConnectionStatusMessage
         {
-            get { return _connectionStatusMessaage ??  (_connectionStatusMessaage = new StringBuilder()); }
-            private set { SetPropertyChanged(ref _connectionStatusMessaage, value); }
+            get { return _connectionStatusMessaage; }
+            private set
+            {
+                SetPropertyChanged(ref _connectionStatusMessaage, value);
+            }
         }
         public abstract DeviceType DeviceType { get; }
         public abstract ConnectionType ConnectionType { get; }
@@ -56,8 +56,6 @@ namespace Xamarin.MagTek.Forms.Models
         /// INSError error from device
         /// </summary>
         public Action<INSError> OnDeviceError { get; set; }
-
-
         #endregion
 
 
@@ -196,7 +194,7 @@ namespace Xamarin.MagTek.Forms.Models
             }
             finally
             {
-                updateDeviceState();
+                UpdateDeviceState();
             }
         }
         private void MagtekService_OnDeviceErrorDelegate(INSError error)
@@ -221,31 +219,37 @@ namespace Xamarin.MagTek.Forms.Models
             }
             finally
             {
-                updateDeviceState();
+                UpdateDeviceState();
             }
         }
-        private void updateDeviceState()
+        protected void UpdateDeviceState()
         {
-            ConnectionStatusMessage.Clear();
+            ConnectionStatusMessage = null;
             switch (State)
             {
                 case ConnectionState.Error:
-                    ConnectionStatusMessage.Append("Something went wrong please try again.");
+                    ConnectionStatusMessage = "Something went wrong please try again.";
                     break;
                 case ConnectionState.Connected:
-                    ConnectionStatusMessage.Append("Your device is ready to use.");
+                    ConnectionStatusMessage = "Your device is ready to use.";
                     break;
                 case ConnectionState.Connecting:
-                    ConnectionStatusMessage.Append("Attempting to connect...");
+                    ConnectionStatusMessage = "Attempting to connect...";
                     break;
                 case ConnectionState.Disconnecting:
                 case ConnectionState.Disconnected:
                 default:
-                    ConnectionStatusMessage.Append("Device not Connected");
-                    if (IsDeviceRegisteredToClient)
+                    if (Bond == Bond.Bonding)
                     {
-                        ConnectionStatusMessage.Append(Environment.NewLine);
-                        ConnectionStatusMessage.Append("You may need to remove and repair this device.");
+                        ConnectionStatusMessage = "Pairing Device";
+                    }
+                    else if (Bond == Bond.Bonded)
+                    {
+                        ConnectionStatusMessage = "Paired. Ready to connect.";
+                    }
+                    else
+                    {
+                        ConnectionStatusMessage = "Device not Connected";
                     }
                     break;
             }
@@ -304,7 +308,6 @@ namespace Xamarin.MagTek.Forms.Models
                     // set device type to none
                     MagtekService.SetConnectionType((int)DeviceType.MAGTEKAUDIOREADER);
                 }
-                IsDeviceRegisteredToClient = false;
             }
             catch (Exception)
             {
