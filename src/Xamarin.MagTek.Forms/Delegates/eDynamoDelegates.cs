@@ -1,7 +1,7 @@
-﻿using Xamarin.Forms.MagTek.Enums;
-using Xamarin.Forms.MagTek.Models;
+﻿using Xamarin.MagTek.Forms.Enums;
+using Xamarin.MagTek.Forms.Models;
 
-namespace Xamarin.Forms.MagTek.Delegates.MagTek
+namespace Xamarin.MagTek.Forms.Delegates
 {
     public delegate void OnARQCReceivedDelegate(INSData data);
     public delegate void OnBleReaderConnectedDelegate(ICBPeripheral peripheral);

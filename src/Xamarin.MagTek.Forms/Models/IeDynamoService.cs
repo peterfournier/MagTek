@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
-using Xamarin.Forms.MagTek.Delegates.MagTek;
+using Xamarin.MagTek.Forms.Delegates;
 
-namespace Xamarin.Forms.MagTek.Models
+namespace Xamarin.MagTek.Forms.Models
 {
     public interface IeDynamoService
     {
+        bool CreateBond(string address);
         bool CloseDevice();
         bool IsDeviceConnected();
         bool IsDeviceEMV();
@@ -28,7 +29,7 @@ namespace Xamarin.Forms.MagTek.Models
         event OnTransactionResultDelegate OnTransactionResultDelegate;
         event OnTransactionStatusDelegate OnTransactionStatusDelegate;
         event OnUserSelectionRequestDelegate OnUserSelectionRequestDelegate;
-        ICollection<IMagTekDevice> GetDiscoveredPeripherals();
+        ICollection<IDiscoveredDevice> GetDiscoveredPeripherals();
         int CancelTransaction();
         int CardPANLength();
         int MagnePrintLength();
@@ -88,8 +89,7 @@ namespace Xamarin.Forms.MagTek.Models
         string TrackDecodeStatus();
         void ClearBuffers();
         void ListenForEvents(int @event);
-        void RequestDeviceList(int type);
-        void SetAddress(string address);
+        void RequestDeviceList(int type);        
         void SetConfigurationParams(string pData);
         void SetConnectionType(int connectionType);
         void SetDeviceProtocolString(string pData);

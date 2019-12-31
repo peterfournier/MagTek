@@ -1,16 +1,20 @@
 ﻿using System;
-using Xamarin.Forms.MagTek.Enums;
+using Xamarin.Forms;
+using Xamarin.MagTek.Forms.Enums;
 
-namespace Xamarin.Forms.MagTek.Models
+namespace Xamarin.MagTek.Forms.Models
 {
-    internal class IDyanamo : MagTekDevice
+    internal class IDynamo : MagTekDevice
     {
         private const string MagTekDeviceProtocolString = "com.magtek.idynamo";
 
         public override DeviceType DeviceType => DeviceType.MAGTEKIDYNAMO;
         public override ConnectionType ConnectionType => ConnectionType.Lightning;
 
-        public IDyanamo(IeDynamoService magTekService) : base(magTekService)
+        public IDynamo(IeDynamoService magTekService,
+            string address,
+            string id,
+            string name) : base(magTekService, address, id, name)
         {
             if (Device.RuntimePlatform == Device.Android)
                 throw new InvalidOperationException("Invalid runtime platform. iDyanamo is not supported with Android devices.");
@@ -20,7 +24,7 @@ namespace Xamarin.Forms.MagTek.Models
         {
             base.TryToConnectToDevice();
 
-            _MagtekService.SetDeviceProtocolString(MagTekDeviceProtocolString);
+            MagtekService.SetDeviceProtocolString(MagTekDeviceProtocolString);
 
         }
     }

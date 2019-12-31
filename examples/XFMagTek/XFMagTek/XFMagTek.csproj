@@ -10,12 +10,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="LiveXAML" Version="2.1.73" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
     <PackageReference Include="Xamarin.Forms" Version="3.6.0.709228" />  
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\src\Xamarin.Forms.MagTek\Xamarin.Forms.MagTek.csproj" />
+    <ProjectReference Include="..\..\..\src\Xamarin.MagTek.Forms\Xamarin.MagTek.Forms.csproj" />
   </ItemGroup>
 
   <ItemGroup>

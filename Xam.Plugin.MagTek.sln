@@ -21,7 +21,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XFMagTek", "examples\XFMagT
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Xam.Plugin.MagTek.Android", "src\Xam.Plugin.MagTek.Android\Xam.Plugin.MagTek.Android.csproj", "{052CDC2E-3A38-4F4D-A23C-4B4935D4579F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Xamarin.Forms.MagTek", "src\Xamarin.Forms.MagTek\Xamarin.Forms.MagTek.csproj", "{2ECCB3B6-9886-4630-BA50-6CCB489311AD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Xamarin.MagTek.Forms", "src\Xamarin.MagTek.Forms\Xamarin.MagTek.Forms.csproj", "{2ECCB3B6-9886-4630-BA50-6CCB489311AD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

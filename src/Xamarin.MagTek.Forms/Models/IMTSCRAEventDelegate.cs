@@ -1,4 +1,4 @@
-﻿namespace Xamarin.Forms.MagTek.Models
+﻿namespace Xamarin.MagTek.Forms.Models
 {
     public interface IMTSCRAEventDelegate
     {

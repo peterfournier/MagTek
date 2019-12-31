@@ -1,6 +1,7 @@
 ﻿using Android.OS;
 using Com.Magtek.Mobile.Android.Mtlib;
-using XFMagTek.Delegates.MagTek;
+using System.Diagnostics;
+using Xamarin.MagTek.Forms.Delegates;
 using static Android.OS.Handler;
 
 namespace XFMagTek.Droid
@@ -34,6 +35,12 @@ namespace XFMagTek.Droid
                     break;
                 case OnDeviceResponse:
                     OnDeviceResponseDelegate?.Invoke(msg.Obj.ToString());
+                    break;
+                default:
+                    if (Debugger.IsLogging())
+                    {
+                        Debugger.Log(0,"TRACE", $"{msg.Asynchronous}");
+                    }
                     break;
             }
             return true;

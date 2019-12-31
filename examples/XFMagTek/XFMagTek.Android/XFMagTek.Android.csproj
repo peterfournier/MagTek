@@ -60,6 +60,7 @@
     <PackageReference Include="Xamarin.Android.Support.v7.MediaRouter" Version="28.0.0.1" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Custom\DiscoveredDevice.cs" />
     <Compile Include="Custom\MTSCRA_delegates_droid.cs" />
     <Compile Include="Custom\MTSCRA_Service_droid.cs" />
     <Compile Include="MainActivity.cs" />
@@ -97,6 +98,10 @@
     <Folder Include="Resources\drawable-xxxhdpi\" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\src\Xamarin.MagTek.Forms\Xamarin.MagTek.Forms.csproj">
+      <Project>{2eccb3b6-9886-4630-ba50-6ccb489311ad}</Project>
+      <Name>Xamarin.MagTek.Forms</Name>
+    </ProjectReference>
     <ProjectReference Include="..\XFMagTek\XFMagTek.csproj">
       <Project>{547CD010-CA8E-4529-8580-6CD01E51C717}</Project>
       <Name>XFMagTek</Name>

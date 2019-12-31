@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Xamarin.Forms.MagTek.Models
+namespace Xamarin.MagTek.Forms.Models
 {
     public interface INSNotification
     {

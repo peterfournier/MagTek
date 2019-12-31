@@ -68,6 +68,7 @@
     <AppExtensionDebugBundleId />
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Custom\DiscoveredDevice.cs" />
     <Compile Include="Custom\eDynamoDelegates_iOS.cs" />
     <Compile Include="Custom\eDynamoService_iOS.cs" />
     <Compile Include="Main.cs" />
@@ -146,6 +147,10 @@
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
   <ItemGroup>
+    <ProjectReference Include="..\..\..\src\Xamarin.MagTek.Forms\Xamarin.MagTek.Forms.csproj">
+      <Project>{2eccb3b6-9886-4630-ba50-6ccb489311ad}</Project>
+      <Name>Xamarin.MagTek.Forms</Name>
+    </ProjectReference>
     <ProjectReference Include="..\XFMagTek\XFMagTek.csproj">
       <Project>{547CD010-CA8E-4529-8580-6CD01E51C717}</Project>
       <Name>XFMagTek</Name>

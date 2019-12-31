@@ -2,7 +2,7 @@
 <ContentPage
     xmlns="http://xamarin.com/schemas/2014/forms"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:enums="clr-namespace:XFMagTek.Enums"
+    xmlns:enums="clr-namespace:Xamarin.MagTek.Forms.Enums;assembly=Xamarin.MagTek.Forms"
     xmlns:utils="clr-namespace:XFMagTek.Utilities"
     x:Class="XFMagTek.Views.eDynamoDeviceSetupPage"
     Title="MagTek device Manager"
@@ -21,22 +21,16 @@
     </ContentPage.Resources>
     <ScrollView>
         <StackLayout
-                HorizontalOptions="FillAndExpand"
-                VerticalOptions="FillAndExpand"
-                Padding="10"
-                >
+            Padding="10"
+            >
             <!--magtek device list-->
             <Frame 
-                    x:Name="frame"
-                    BackgroundColor="{DynamicResource secondaryBackgroundColor}"
-                    Padding="10"
-                    HeightRequest="300"
-                    VerticalOptions="Start"
-                    >
-                <StackLayout
-                        HorizontalOptions="FillAndExpand"
-                        VerticalOptions="FillAndExpand"
-                        >
+                x:Name="frame"
+                BackgroundColor="{DynamicResource secondaryBackgroundColor}"
+                Padding="10"
+                VerticalOptions="Start"
+                >
+                <StackLayout>
 
                     <!--header-->
                     <StackLayout
@@ -95,13 +89,12 @@
                     </StackLayout>
                     <!--listview-->
                     <ListView
-                            IsVisible="{Binding Scanning, 
-                                Converter={x:Static utils:Converters.InverseBoolConverter}}"
-                            RowHeight="50"
-                            ItemsSource="{Binding DevicesList}"
-                            SelectedItem="{Binding SelectedDevice, Mode=TwoWay}"
-                            HeightRequest="180"                            
-                            >
+                        IsVisible="{Binding Scanning, Converter={x:Static utils:Converters.InverseBoolConverter}}"
+                        RowHeight="50"
+                        ItemsSource="{Binding MagTekFactory.FoundDevices}"
+                        SelectedItem="{Binding SelectedDevice, Mode=TwoWay}"
+                        HeightRequest="180"
+                        >
                         <ListView.ItemTemplate>
                             <DataTemplate>
                                 <ViewCell>
@@ -109,7 +102,7 @@
                                         RowSpacing="0"      
                                         >
                                         <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="45"/>
+                                            <ColumnDefinition   Width="45"/>
                                             <ColumnDefinition Width="*"/>
                                         </Grid.ColumnDefinitions>
                                         <Grid.RowDefinitions>
@@ -125,7 +118,7 @@
                                             Text="{Binding Name}" 
                                             VerticalTextAlignment="Center"
                                             />
-
+                                        
                                         <StackLayout 
                                             Grid.Row="1" 
                                             Grid.ColumnSpan="2"
@@ -176,7 +169,7 @@
                 <Frame
                         IsVisible="{Binding SelectedDevice.DeviceType, 
                                 Converter={x:Static utils:Converters.StringsAreEqualToBoolConverter},
-                                ConverterParameter={x:Static enums:MTDeviceType.MAGTEKEDYNAMO }}"
+                                ConverterParameter={x:Static enums:DeviceType.MAGTEKEDYNAMO }}"
                         HorizontalOptions="FillAndExpand"
                         Padding="8"
                         >
@@ -232,7 +225,7 @@
                                 Orientation="Horizontal"
                                 IsVisible="{Binding SelectedDevice.State, 
                                     Converter={x:Static utils:Converters.StringsAreEqualToBoolConverter},
-                                    ConverterParameter={x:Static enums:MTConnectionState.Disconnected }}"
+                                    ConverterParameter={x:Static enums:ConnectionState.Disconnected }}"
                                 >
                             <Button
                                     IsVisible="{Binding IsBusy, Converter={x:Static utils:Converters.InverseBoolConverter}}"
@@ -252,7 +245,7 @@
                         <StackLayout
                                 IsVisible="{Binding SelectedDevice.State, 
                                     Converter={x:Static utils:Converters.StringsAreEqualToBoolConverter},
-                                    ConverterParameter={x:Static enums:MTConnectionState.Connected }}"
+                                    ConverterParameter={x:Static enums:ConnectionState.Connected }}"
                                 >
                             <Button
                                     IsVisible="{Binding IsBusy, Converter={x:Static utils:Converters.InverseBoolConverter}}"
@@ -278,7 +271,7 @@
 
                             <Label
                                     Style="{StaticResource s1Label}"
-                                    Text="{Binding ConnectionStatus}"
+                                    Text="{Binding SelectedDevice.ConnectionStatusMessage}"
                                     VerticalTextAlignment="Center"
                                     >
                             </Label>
@@ -288,7 +281,7 @@
                         <StackLayout
                                 IsVisible="{Binding SelectedDevice.State, 
                                     Converter={x:Static utils:Converters.StringsAreEqualToBoolConverter},
-                                    ConverterParameter={x:Static enums:MTConnectionState.Connected }}"
+                                    ConverterParameter={x:Static enums:ConnectionState.Connected }}"
                                 >
                             <Button
                                     IsVisible="{Binding SelectedDevice.IsDeviceRegisteredToHost, Converter={x:Static utils:Converters.InverseBoolConverter}}"
@@ -318,7 +311,7 @@
                 <Frame
                         IsVisible="{Binding SelectedDevice.DeviceType, 
                                 Converter={x:Static utils:Converters.StringsAreEqualToBoolConverter},
-                                ConverterParameter={x:Static enums:MTDeviceType.MAGTEKIDYNAMO }}"
+                                ConverterParameter={x:Static enums:DeviceType.MAGTEKIDYNAMO }}"
                         BackgroundColor="{DynamicResource secondaryBackgroundColor}"
                         Padding="8"
                         HorizontalOptions="FillAndExpand"
@@ -351,7 +344,7 @@
                                 Orientation="Horizontal"
                                 IsVisible="{Binding SelectedDevice.State, 
                                     Converter={x:Static utils:Converters.StringsAreEqualToBoolConverter},
-                                    ConverterParameter={x:Static enums:MTConnectionState.Disconnected }}"
+                                    ConverterParameter={x:Static enums:ConnectionState.Disconnected }}"
                                 >
                             <Button
                                     IsVisible="{Binding IsBusy, Converter={x:Static utils:Converters.InverseBoolConverter}}"
@@ -371,7 +364,7 @@
                         <StackLayout
                                 IsVisible="{Binding SelectedDevice.State, 
                                     Converter={x:Static utils:Converters.StringsAreEqualToBoolConverter},
-                                    ConverterParameter={x:Static enums:MTConnectionState.Connected }}"
+                                    ConverterParameter={x:Static enums:ConnectionState.Connected }}"
                                 >
                             <Button
                                     IsVisible="{Binding IsBusy, Converter={x:Static utils:Converters.InverseBoolConverter}}"
@@ -403,7 +396,7 @@
 
                             <Label
                                     Style="{StaticResource s1Label}"
-                                    Text="{Binding ConnectionStatus}"
+                                    Text="{Binding SelectedDevice.ConnectionStatusMessage}"
                                     VerticalTextAlignment="Center"
                                     >
                             </Label>
@@ -413,7 +406,7 @@
                         <StackLayout
                                 IsVisible="{Binding SelectedDevice.State, 
                                     Converter={x:Static utils:Converters.StringsAreEqualToBoolConverter},
-                                    ConverterParameter={x:Static enums:MTConnectionState.Connected }}"
+                                    ConverterParameter={x:Static enums:ConnectionState.Connected }}"
                                 >
                             <Button
                                     IsVisible="{Binding SelectedDevice.IsDeviceRegisteredToHost, Converter={x:Static utils:Converters.InverseBoolConverter}}"

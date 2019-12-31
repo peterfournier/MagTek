@@ -2,7 +2,7 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace Xamarin.Forms.MagTek.Models
+namespace Xamarin.MagTek.Forms.Models
 {
     internal abstract class BaseNotify : INotifyPropertyChanged
     {
@@ -29,7 +29,7 @@ namespace Xamarin.Forms.MagTek.Models
 
             currentValue = newValue;
 
-            var dirty = sender as Xamarin.Forms.MagTek.Models.IDirty;
+            var dirty = sender as Xamarin.MagTek.Forms.Models.IDirty;
 
             if (dirty != null)
                 dirty.IsDirty = true;

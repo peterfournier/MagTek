@@ -2,10 +2,9 @@
 using MTSCRA_Bindings.iOS;
 using System.Collections.Generic;
 using System;
-using XFMagTek.Enums;
-using XFMagTek.Interfaces.MagTek;
 using XFMagTek.iOS;
-using XFMagTek.Models.MagTek;
+using Xamarin.MagTek.Forms.Models;
+using Xamarin.MagTek.Forms.Enums;
 
 [assembly: Xamarin.Forms.Dependency(typeof(eDynamoService_iOS))]
 namespace XFMagTek.iOS
@@ -22,26 +21,26 @@ namespace XFMagTek.iOS
     public class eDynamoService_iOS : IeDynamoService
     {
         private readonly MTSCRA _cardReader;
-        private MTConnectionState currentState = MTConnectionState.Disconnected;
+        private ConnectionState currentState = ConnectionState.Disconnected;
 
-        public event XFMagTek.Delegates.MagTek.OnARQCReceivedDelegate OnARQCReceivedDelegate;
-        public event XFMagTek.Delegates.MagTek.OnBleReaderConnectedDelegate OnBleReaderConnectedDelegate;
-        public event XFMagTek.Delegates.MagTek.OnBleReaderDidDiscoverPeripheralDelegate OnBleReaderDidDiscoverPeripheralDelegate;
-        public event XFMagTek.Delegates.MagTek.OnBleReaderStateUpdatedDelegate OnBleReaderStateUpdatedDelegate;
-        public event XFMagTek.Delegates.MagTek.OnCardSwipeDidGetTransErrorDelegate OnCardSwipeDidGetTransErrorDelegate;
-        public event XFMagTek.Delegates.MagTek.OnCardSwipeDidStartDelegate OnCardSwipeDidStartDelegate;
-        public event XFMagTek.Delegates.MagTek.OnDataReceivedDelegate OnDataReceivedDelegate;
-        public event XFMagTek.Delegates.MagTek.OnDeviceConnectionDidChangeDelegate OnDeviceConnectionDidChangeDelegate;
-        public event XFMagTek.Delegates.MagTek.OnDeviceErrorDelegate OnDeviceErrorDelegate;
-        public event XFMagTek.Delegates.MagTek.OnDeviceExtendedResponseDelegate OnDeviceExtendedResponseDelegate;
-        public event XFMagTek.Delegates.MagTek.OnDeviceListDelegate OnDeviceListDelegate;
-        public event XFMagTek.Delegates.MagTek.OnDeviceNotPairedDelegate OnDeviceNotPairedDelegate;
-        public event XFMagTek.Delegates.MagTek.OnDeviceResponseDelegate OnDeviceResponseDelegate;
-        public event XFMagTek.Delegates.MagTek.OnDisplayMessageRequestDelegate OnDisplayMessageRequestDelegate;
-        public event XFMagTek.Delegates.MagTek.OnEMVCommandResultDelegate OnEMVCommandResultDelegate;
-        public event XFMagTek.Delegates.MagTek.OnTransactionResultDelegate OnTransactionResultDelegate;
-        public event XFMagTek.Delegates.MagTek.OnTransactionStatusDelegate OnTransactionStatusDelegate;
-        public event XFMagTek.Delegates.MagTek.OnUserSelectionRequestDelegate OnUserSelectionRequestDelegate;
+        public event Xamarin.MagTek.Forms.Delegates.OnARQCReceivedDelegate OnARQCReceivedDelegate;
+        public event Xamarin.MagTek.Forms.Delegates.OnBleReaderConnectedDelegate OnBleReaderConnectedDelegate;
+        public event Xamarin.MagTek.Forms.Delegates.OnBleReaderDidDiscoverPeripheralDelegate OnBleReaderDidDiscoverPeripheralDelegate;
+        public event Xamarin.MagTek.Forms.Delegates.OnBleReaderStateUpdatedDelegate OnBleReaderStateUpdatedDelegate;
+        public event Xamarin.MagTek.Forms.Delegates.OnCardSwipeDidGetTransErrorDelegate OnCardSwipeDidGetTransErrorDelegate;
+        public event Xamarin.MagTek.Forms.Delegates.OnCardSwipeDidStartDelegate OnCardSwipeDidStartDelegate;
+        public event Xamarin.MagTek.Forms.Delegates.OnDataReceivedDelegate OnDataReceivedDelegate;
+        public event Xamarin.MagTek.Forms.Delegates.OnDeviceConnectionDidChangeDelegate OnDeviceConnectionDidChangeDelegate;
+        public event Xamarin.MagTek.Forms.Delegates.OnDeviceErrorDelegate OnDeviceErrorDelegate;
+        public event Xamarin.MagTek.Forms.Delegates.OnDeviceExtendedResponseDelegate OnDeviceExtendedResponseDelegate;
+        public event Xamarin.MagTek.Forms.Delegates.OnDeviceListDelegate OnDeviceListDelegate;
+        public event Xamarin.MagTek.Forms.Delegates.OnDeviceNotPairedDelegate OnDeviceNotPairedDelegate;
+        public event Xamarin.MagTek.Forms.Delegates.OnDeviceResponseDelegate OnDeviceResponseDelegate;
+        public event Xamarin.MagTek.Forms.Delegates.OnDisplayMessageRequestDelegate OnDisplayMessageRequestDelegate;
+        public event Xamarin.MagTek.Forms.Delegates.OnEMVCommandResultDelegate OnEMVCommandResultDelegate;
+        public event Xamarin.MagTek.Forms.Delegates.OnTransactionResultDelegate OnTransactionResultDelegate;
+        public event Xamarin.MagTek.Forms.Delegates.OnTransactionStatusDelegate OnTransactionStatusDelegate;
+        public event Xamarin.MagTek.Forms.Delegates.OnUserSelectionRequestDelegate OnUserSelectionRequestDelegate;
 
         public eDynamoService_iOS()
         {
@@ -70,23 +69,24 @@ namespace XFMagTek.iOS
 
         #region Interface implementation
 
-        public ICollection<IMagTekDevice> GetDiscoveredPeripherals()
+        public ICollection<IDiscoveredDevice> GetDiscoveredPeripherals()
         {
-            var returnList = new List<IMagTekDevice>();
+            var returnList = new List<IDiscoveredDevice>();
 
             var devices = _cardReader.GetDiscoveredPeripherals();
-            foreach (var item in devices)
+            foreach (var foundDevice in devices)
             {
-                var device = new MagTekDevice
+                var device = new DiscoveredDevice
                 {
-                    Id = item.ValueForKey(new NSString("identifier")).ToString(),
-                    Name = item.ValueForKey(new NSString("name")).ToString(),
-                    Address = item.ValueForKey(new NSString("identifier")).ToString(),
-                    ProductId = 0,
-                    State = getState(item.ValueForKey(new NSString("state")).ToString())
+                    Id = foundDevice.ValueForKey(new NSString("identifier")).ToString(),
+                    Name = foundDevice.ValueForKey(new NSString("name")).ToString(),
+                    Address = foundDevice.ValueForKey(new NSString("identifier")).ToString(),
+                    DeviceType = Xamarin.MagTek.Forms.Enums.DeviceType.MAGTEKEDYNAMO,
+                    //Bond = TODO:
+                    //State = getState(item.ValueForKey(new NSString("state")).ToString())
                 };
 
-                returnList.Add(device as IMagTekDevice);
+                returnList.Add(device as IDiscoveredDevice);
             }
 
 
@@ -418,9 +418,10 @@ namespace XFMagTek.iOS
             _cardReader.RequestDeviceList(type);
         }
 
-        public void SetAddress(string address)
+        public bool CreateBond(string address)
         {
             _cardReader.SetAddress(address);
+            return _cardReader.OpenDevice();
         }
 
         public void SetConfigurationParams(string pData)
@@ -534,7 +535,7 @@ namespace XFMagTek.iOS
 
         private void EDynamoService_iOS_OnBleReaderStateUpdatedDelegate(int state)
         {
-            currentState = (MTConnectionState)state;
+            currentState = (ConnectionState)state;
             OnBleReaderStateUpdatedDelegate?.Invoke(state);
         }
 
@@ -548,20 +549,20 @@ namespace XFMagTek.iOS
             OnARQCReceivedDelegate?.Invoke(getMagTekData(data));
         }
 
-        private MTConnectionState getState(string state)
+        private ConnectionState getState(string state)
         {
             switch (state)
             {
                 case "connecting":
-                    return MTConnectionState.Connecting;
+                    return ConnectionState.Connecting;
                 case "error":
-                    return MTConnectionState.Error;
+                    return ConnectionState.Error;
                 case "connected":
-                    return MTConnectionState.Connected;
+                    return ConnectionState.Connected;
                 case "disconnecting":
-                    return MTConnectionState.Disconnecting;
+                    return ConnectionState.Disconnecting;
                 default:
-                    return MTConnectionState.Disconnected;
+                    return ConnectionState.Disconnected;
             }
         }
 
@@ -631,7 +632,7 @@ namespace XFMagTek.iOS
 
         private ICBPeripheral getPeripheral(CoreBluetooth.CBPeripheral peripheral)
         {
-            return new MagTekCBPeripheral(peripheral.Name, peripheral.RSSI.ToString(), (MTConnectionState)peripheral.State);
+            return new MagTekCBPeripheral(peripheral.Name, peripheral.RSSI.ToString(), (ConnectionState)peripheral.State);
         }
         #endregion
     }

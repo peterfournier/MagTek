@@ -1,6 +1,6 @@
-﻿using Xamarin.Forms.MagTek.Enums;
+﻿using Xamarin.MagTek.Forms.Enums;
 
-namespace Xamarin.Forms.MagTek.Models
+namespace Xamarin.MagTek.Forms.Models
 {
     public class MagTekCBPeripheral : ICBPeripheral
     {

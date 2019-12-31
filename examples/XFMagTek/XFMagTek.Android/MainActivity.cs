@@ -45,10 +45,10 @@ namespace XFMagTek.Droid
             }
 
             // If one of the minimum permissions aren't granted, we request them from the user
-            //if (!minimumPermissionsGranted)
-            //{
+            if (!minimumPermissionsGranted)
+            {
                 RequestPermissions(Permissions, 0);
-            //}
+            }
         }
     }
 }
