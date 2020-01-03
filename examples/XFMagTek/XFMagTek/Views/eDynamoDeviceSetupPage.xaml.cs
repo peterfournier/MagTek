@@ -9,6 +9,7 @@ using Xamarin.Forms.Xaml;
 using XFMagTek.ViewModels;
 using Xamarin.MagTek.Forms;
 using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace XFMagTek.Views
 {
@@ -41,6 +42,7 @@ namespace XFMagTek.Views
         private bool _showNoDevicesFound;
         private Color _magTekDeviceStateColor;
         private ICommand _startScanningCommand;
+        private ICommand _onAddNewDeviceTapCommand;
         private IeDynamoService _cardReaderService = DependencyService.Get<IeDynamoService>();
         private IMagTekDevice _selectedDevice;
         private string _dataResponse;
@@ -97,6 +99,7 @@ namespace XFMagTek.Views
             IsBusy = true;
             if (SelectedDevice != null)
             {
+                //await SelectedDevice.TryToConnectToDeviceAsync();
                 SelectedDevice.TryToConnectToDevice();
             }
         }, () => !IsBusy);
@@ -115,6 +118,55 @@ namespace XFMagTek.Views
             {
                 return _startScanningCommand ??
                     (_startScanningCommand = new Command(async () => await ExecuteScanCommand(), () => { return !IsBusy; }));
+            }
+        }
+        public ICommand OnAddNewDeviceTapCommand
+        {
+            get
+            {
+                return _onAddNewDeviceTapCommand ??
+                    (_onAddNewDeviceTapCommand = new Command(async () =>
+                    {
+
+                        var actionList = new List<string>(); // todo: is this a MagTek factory Method?
+                        if (Device.RuntimePlatform == Device.iOS)
+                        {
+                            actionList.Add("iDynamo");
+                        }
+
+                        // todo: Add USB options.
+
+                        if (actionList.Count > 0)
+                        {
+                            var action = await App.Current.MainPage.DisplayActionSheet("Add New Device", "Cancel", null, actionList.ToArray());
+
+                            switch (action.ToLowerInvariant())
+                            {
+                                case "idynamo":
+
+                                    string deviceSerial = _cardReaderService.MagTekDeviceSerial();
+
+                                    var device = MagTekFactory.CreateDevice(
+                                        deviceSerial,
+                                        DeviceType.MAGTEKIDYNAMO,
+                                        deviceSerial,
+                                        !string.IsNullOrWhiteSpace(deviceSerial) ? $"iDynamo - {deviceSerial}" : "iDynamo",
+                                        Bond.Bonded
+                                        );
+
+                                    FoundDevices.Add(device);
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
+                        else
+                        {
+                            await App.Current.MainPage.DisplayAlert("Info", "No Devices Found", "Ok");
+                        }
+
+
+                    }, () => { return !IsBusy; }));
             }
         }
         public IMagTekDevice SelectedDevice
@@ -319,6 +371,12 @@ namespace XFMagTek.Views
 
         private void onDeviceConnectionStateChanged(int deviceType, bool connected, object instance, ConnectionState connectionState)
         {
+            //DataResponse += $"State Changed: {connectionState.ToString()}{Environment.NewLine}";
+            //DataResponse += $"Connected: {connected}{Environment.NewLine}";
+            //DataResponse += $"DeviceType: {deviceType}{Environment.NewLine}";
+            //if (instance != null)
+            //    DataResponse += $"ObjectInstance: {JsonConvert.SerializeObject(instance, Formatting.None, new JsonSerializerSettings() { ReferenceLoopHandling = ReferenceLoopHandling.Ignore })}{Environment.NewLine}";
+
             switch (connectionState)
             {
                 case ConnectionState.Error:
@@ -355,7 +413,7 @@ namespace XFMagTek.Views
 
         private void onDataRecievedFromDevice(IMTCardData cardDataObject, object instance)
         {
-            Console.WriteLine(JsonConvert.SerializeObject(cardDataObject));
+            DataResponse = JsonConvert.SerializeObject(cardDataObject);
             IsBusy = false;
         }
 

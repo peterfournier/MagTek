@@ -91,7 +91,7 @@
                     <ListView
                         IsVisible="{Binding Scanning, Converter={x:Static utils:Converters.InverseBoolConverter}}"
                         RowHeight="50"
-                        ItemsSource="{Binding MagTekFactory.Devices}"
+                        ItemsSource="{Binding FoundDevices}"
                         SelectedItem="{Binding SelectedDevice, Mode=TwoWay}"
                         HeightRequest="180"
                         >
@@ -321,6 +321,21 @@
                                 ></Label>
                     </StackLayout>
                 </Frame>
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
                 <!--idynamo selected-->
                 <Frame
                         IsVisible="{Binding SelectedDevice.DeviceType, 
@@ -354,6 +369,8 @@
                                 Text="2.  Press Connect button below."
                                 ></Label>
 
+                        
+                        <!--connect-->
                         <StackLayout
                                 Orientation="Horizontal"
                                 IsVisible="{Binding SelectedDevice.State, 
@@ -375,6 +392,7 @@
                                     ></ActivityIndicator>
                         </StackLayout>
 
+                        <!--disconnect-->
                         <StackLayout
                                 IsVisible="{Binding SelectedDevice.State, 
                                     Converter={x:Static utils:Converters.StringsAreEqualToBoolConverter},
@@ -387,12 +405,6 @@
                                     HorizontalOptions="Start">
                             </Button>
                         </StackLayout>
-
-                        <Label 
-                                LineBreakMode="WordWrap"
-                                Style="{StaticResource s1Label}" 
-                                Text="3.  Once connected, click Register this Device."
-                                ></Label>
 
                         <!--device status indicator-->
                         <StackLayout
@@ -415,19 +427,6 @@
                                     >
                             </Label>
 
-                        </StackLayout>
-
-                        <StackLayout
-                                IsVisible="{Binding SelectedDevice.State, 
-                                    Converter={x:Static utils:Converters.StringsAreEqualToBoolConverter},
-                                    ConverterParameter={x:Static enums:ConnectionState.Connected }}"
-                                >
-                            <Button
-                                    IsVisible="{Binding SelectedDevice.IsDeviceRegisteredToHost, Converter={x:Static utils:Converters.InverseBoolConverter}}"
-                                    Command="{Binding OnRegisterDeviceTapCommand}"
-                                    Text="Register this Device"
-                                    HorizontalOptions="Start">
-                            </Button>
                         </StackLayout>
 
                         <Label 

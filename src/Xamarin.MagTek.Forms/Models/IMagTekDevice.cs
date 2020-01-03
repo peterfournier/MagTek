@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Text;
+using System.Threading.Tasks;
 using Xamarin.MagTek.Forms.Enums;
 
 namespace Xamarin.MagTek.Forms.Models
@@ -17,7 +18,7 @@ namespace Xamarin.MagTek.Forms.Models
         DeviceType DeviceType { get; }
         void TryToConnectToDevice();
         void DisconnectDevice();
-        bool IsDeviceIsAlreadyConnected();
+        bool CheckIfDeviceIsAlreadyConnected();
         IMTCardData CardData { get; }
         string ConnectionStatusMessage { get; }
         Action OnCardSwiped { get; set; }

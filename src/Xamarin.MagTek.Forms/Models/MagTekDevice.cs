@@ -2,6 +2,7 @@
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Threading.Tasks;
 using Xamarin.Forms;
 using Xamarin.MagTek.Forms.Enums;
 
@@ -32,8 +33,8 @@ namespace Xamarin.MagTek.Forms.Models
         public string GroupingLetter => Bond == Bond.Bonded || State == ConnectionState.Connected ? "Paired" : "Not Paired";
         public string ConnectionStatusMessage
         {
-            get { return _connectionStatusMessaage; }
-            private set
+            get { return _connectionStatusMessaage ?? (_connectionStatusMessaage = string.Empty); }
+            protected set
             {
                 SetPropertyChanged(ref _connectionStatusMessaage, value);
             }
@@ -62,6 +63,7 @@ namespace Xamarin.MagTek.Forms.Models
         #region Events
 
         #endregion
+
 
         #region Con/De structors
 
@@ -275,18 +277,40 @@ namespace Xamarin.MagTek.Forms.Models
                 throw;
             }
         }
-        public bool IsDeviceIsAlreadyConnected()
+
+        //public async virtual Task TryToConnectToDeviceAsync()
+        //{
+        //    try
+        //    {
+        //        if (deviceIsAlreadyConnectedAndOpen())
+        //            return;
+
+        //        closeDeviceIfAlreadyOpenButNotConnected();
+
+        //        await Task.Delay(100);
+        //        MagtekService.SetDeviceType(DeviceType.GetHashCode());
+
+        //        await Task.Delay(100);
+        //        MagtekService.SetConnectionType(ConnectionType.GetHashCode());
+        //    }
+        //    catch (Exception)
+        //    {
+        //        State = ConnectionState.Error;
+        //        throw;
+        //    }
+        //}
+        public bool CheckIfDeviceIsAlreadyConnected()
         {
             if (MagtekService.IsDeviceOpened()
                 && (MagtekService.IsDeviceConnected())
-                && MagtekService.DeviceType() == (short)this.DeviceType)
+                && MagtekService.DeviceType() == DeviceType.GetHashCode())
             {
-                //State = ConnectionState.Connected;
+                State = ConnectionState.Connected;
                 return true;
             }
             else
             {
-                //State = ConnectionState.Disconnected;
+                State = ConnectionState.Disconnected;
                 return false;
             }
         }

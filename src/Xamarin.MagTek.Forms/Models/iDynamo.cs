@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Xamarin.Forms;
 using Xamarin.MagTek.Forms.Enums;
 
@@ -26,6 +27,17 @@ namespace Xamarin.MagTek.Forms.Models
 
             MagtekService.SetDeviceProtocolString(MagTekDeviceProtocolString);
 
+            MagtekService.OpenDevice();
+
+            updateBond();
+        }
+
+        private void updateBond()
+        {
+            if (State == ConnectionState.Connected)
+                Bond = Bond.Bonded;
+            else
+                Bond = Bond.None;
         }
     }
 }

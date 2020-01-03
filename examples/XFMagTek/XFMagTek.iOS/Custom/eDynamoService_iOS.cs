@@ -5,6 +5,7 @@ using System;
 using XFMagTek.iOS;
 using Xamarin.MagTek.Forms.Models;
 using Xamarin.MagTek.Forms.Enums;
+using CoreBluetooth;
 
 [assembly: Xamarin.Forms.Dependency(typeof(eDynamoService_iOS))]
 namespace XFMagTek.iOS
@@ -77,17 +78,32 @@ namespace XFMagTek.iOS
             var devices = _cardReader.GetDiscoveredPeripherals();
             foreach (var foundDevice in devices)
             {
-                var device = new DiscoveredDevice
+                if (foundDevice is CBPeripheral peripheral)
                 {
-                    Id = foundDevice.ValueForKey(new NSString("identifier")).ToString(),
-                    Name = foundDevice.ValueForKey(new NSString("name")).ToString(),
-                    Address = foundDevice.ValueForKey(new NSString("identifier")).ToString(),
-                    DeviceType = Xamarin.MagTek.Forms.Enums.DeviceType.MAGTEKEDYNAMO,
-                    //Bond = TODO:
-                    //State = getState(item.ValueForKey(new NSString("state")).ToString())
-                };
+                    var device = new DiscoveredDevice
+                    {
+                        Id = peripheral.Identifier.ToString(),
+                        Name = peripheral.Name,
+                        Address = peripheral.Identifier.ToString(),
+                        DeviceType = Xamarin.MagTek.Forms.Enums.DeviceType.MAGTEKEDYNAMO,
+                        Bond = peripheral.State == CBPeripheralState.Connected ? Bond.Bonded : Bond.None,
+                    };
 
-                returnList.Add(device as IDiscoveredDevice);
+                    returnList.Add(device as IDiscoveredDevice);
+                }
+
+
+                //var device = new DiscoveredDevice
+                //{
+                //    Id = foundDevice.ValueForKey(new NSString("identifier")).ToString(),
+                //    Name = foundDevice.ValueForKey(new NSString("name")).ToString(),
+                //    Address = foundDevice.ValueForKey(new NSString("identifier")).ToString(),
+                //    DeviceType = Xamarin.MagTek.Forms.Enums.DeviceType.MAGTEKEDYNAMO,
+                //    //Bond = TODO:
+                //    //State = getState(item.ValueForKey(new NSString("state")).ToString())
+                //};
+
+                //returnList.Add(device as IDiscoveredDevice);
             }
 
 
@@ -422,6 +438,10 @@ namespace XFMagTek.iOS
         public void CreateBond(string address)
         {
             _cardReader.SetAddress(address);
+
+            //var manager = new CBPeripheralManager();
+            //var device = manager.
+
             //return _cardReader.OpenDevice();
         }
 
@@ -432,6 +452,29 @@ namespace XFMagTek.iOS
 
         public void SetConnectionType(int connectionType)
         {
+            //Xamarin.MagTek.Forms.Enums.ConnectionType mTConnectionType = (Xamarin.MagTek.Forms.Enums.ConnectionType)connectionType;
+
+            //switch (connectionType)
+            //{
+            //    case Xamarin.MagTek.Forms.Enums.ConnectionType.BLE:
+            //        _cardReader.SetConnectionType(MTConnectionType.Ble);
+            //        break;
+            //    case Xamarin.MagTek.Forms.Enums.ConnectionType.BLEEMV:
+            //        _cardReader.SetConnectionType(MTConnectionType.Bleemv);
+            //        break;
+            //    case Xamarin.MagTek.Forms.Enums.ConnectionType.Bluetooth:
+            //        _cardReader.SetConnectionType(MTConnectionType.Bluetooth);
+            //        break;
+            //    case Xamarin.MagTek.Forms.Enums.ConnectionType.USB:
+            //        _cardReader.SetConnectionType(MTConnectionType.Usb);
+            //        break;
+            //    case Xamarin.MagTek.Forms.Enums.ConnectionType.Audio:
+            //        _cardReader.SetConnectionType(MTConnectionType.Audio);
+            //        break;
+            //    case Xamarin.MagTek.Forms.Enums.ConnectionType.Lightning:
+            //        break;
+            //}
+
             _cardReader.SetConnectionType(connectionType);
         }
 
@@ -516,7 +559,15 @@ namespace XFMagTek.iOS
 
         private void EDynamoService_iOS_OnDeviceConnectionDidChangeDelegate(nuint deviceType, bool connected, NSObject instance)
         {
-            OnDeviceConnectionDidChangeDelegate?.Invoke((int)deviceType, connected, instance, currentState);
+            var state = currentState == ConnectionState.Disconnected
+                            ? (connected ? ConnectionState.Connected : ConnectionState.Disconnected)
+                            : currentState;
+
+            OnDeviceConnectionDidChangeDelegate?.Invoke(
+                (int)deviceType, 
+                connected, 
+                instance, 
+                state);
         }
 
         private void EDynamoService_iOS_OnDataReceivedDelegate(MTCardData cardDataObj, NSObject instance)

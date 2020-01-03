@@ -23,6 +23,9 @@ namespace XFMagTek.iOS
         public override bool FinishedLaunching(UIApplication app, NSDictionary options)
         {
             global::Xamarin.Forms.Forms.Init();
+
+            MagTekeDynamoApi.Init();
+
             LoadApplication(new App());
 
             return base.FinishedLaunching(app, options);
