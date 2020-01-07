@@ -5,9 +5,7 @@ Please refer to the MagTek SDK: https://www.magtek.com/support/edynamo?tab=softw
 Hope you enjoy!
 
 ### Roadmap:
-* Xamarin.Forms MagTek
-* Xamarin.Android MagTek
-* Xamarin.iOS MagTek
+* ~~Xamarin.MagTek.Forms~~
 * ~~Xamarin.Forms Example~~
 * ~~MTSCRA_Bindings.iOS~~
 * ~~MTSCRA_Bindings.Android~~
