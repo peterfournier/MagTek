@@ -332,7 +332,7 @@ namespace MTSCRA_Bindings.iOS
         void RequestDeviceList(int type);
 
         // -(void)setAdress:(NSString *)address;
-        [Export("setAdress:")]
+        [Export("setAddress:")]
         void SetAddress(string address);
 
         // -(int)getProductID;

@@ -16,7 +16,7 @@ namespace Xamarin.MagTek.Forms.Models
         int ProductId { get; set; }
         string GroupingLetter { get; }
         DeviceType DeviceType { get; }
-        void TryToConnectToDevice();
+        Task TryToConnectToDeviceAsync();
         void DisconnectDevice();
         bool CheckIfDeviceIsAlreadyConnected();
         IMTCardData CardData { get; }
@@ -29,7 +29,7 @@ namespace Xamarin.MagTek.Forms.Models
         /// <summary>
         /// int deviceType, bool connected, object instance, ConnectionState connectionState
         /// </summary>
-        Action<int, bool, object, ConnectionState> OnDeviceConnectionStateChanged { get; set; }
+        Action<ConnectionState> OnDeviceConnectionStateChanged { get; set; }
         /// <summary>
         /// INSError error from device
         /// </summary>

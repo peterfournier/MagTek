@@ -93,17 +93,6 @@ namespace XFMagTek.iOS
                 }
 
 
-                //var device = new DiscoveredDevice
-                //{
-                //    Id = foundDevice.ValueForKey(new NSString("identifier")).ToString(),
-                //    Name = foundDevice.ValueForKey(new NSString("name")).ToString(),
-                //    Address = foundDevice.ValueForKey(new NSString("identifier")).ToString(),
-                //    DeviceType = Xamarin.MagTek.Forms.Enums.DeviceType.MAGTEKEDYNAMO,
-                //    //Bond = TODO:
-                //    //State = getState(item.ValueForKey(new NSString("state")).ToString())
-                //};
-
-                //returnList.Add(device as IDiscoveredDevice);
             }
 
 

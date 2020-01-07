@@ -15,7 +15,7 @@ namespace Xamarin.MagTek.Forms.Models
         private string _name;
         private string _address;
         private int _productId;
-        private bool _isDeviceRegisteredToHost;
+        private bool _deviceNotPairedButConnectedAndOpend;
         private Bond _bond = Bond.None;
         private ConnectionState _state;
         private string _connectionStatusMessaage;
@@ -29,7 +29,18 @@ namespace Xamarin.MagTek.Forms.Models
             get { return _bond; }
             set { SetPropertyChanged(ref _bond, value); }
         }
-        public ConnectionState State { get { return _state; } private set { SetPropertyChanged(ref _state, value, nameof(State)); } }
+        public ConnectionState State
+        {
+            get { return _state; }
+            private set
+            {
+                if (SetPropertyChanged(ref _state, value, nameof(State)))
+                {
+                    OnDeviceConnectionStateChanged?.Invoke(State);
+                    UpdateDeviceMessages();
+                }
+            }
+        }
         public string GroupingLetter => Bond == Bond.Bonded || State == ConnectionState.Connected ? "Paired" : "Not Paired";
         public string ConnectionStatusMessage
         {
@@ -52,11 +63,15 @@ namespace Xamarin.MagTek.Forms.Models
         /// <summary>
         /// int deviceType, bool connected, object instance, ConnectionState connectionState
         /// </summary>
-        public Action<int, bool, object, ConnectionState> OnDeviceConnectionStateChanged { get; set; }
+        public Action<ConnectionState> OnDeviceConnectionStateChanged { get; set; }
         /// <summary>
         /// INSError error from device
         /// </summary>
         public Action<INSError> OnDeviceError { get; set; }
+        /// <summary>
+        /// Only fires for iOS it seems
+        /// </summary>
+        public Action OnDeviceNotPaired { get; set; }
         #endregion
 
 
@@ -97,13 +112,17 @@ namespace Xamarin.MagTek.Forms.Models
         private void closeDeviceIfAlreadyOpenButNotConnected()
         {
             if (MagtekService.IsDeviceOpened())
+            {
+                MagtekService.ClearBuffers();
                 MagtekService.CloseDevice();
+            }
         }
         private bool deviceIsAlreadyConnectedAndOpen()
         {
             if (MagtekService.IsDeviceOpened()
                 && MagtekService.IsDeviceConnected()
-                && !IsSwitchingDevice())
+                && !IsSwitchingDevice()
+                )
             {
                 State = ConnectionState.Connected;
                 return true;
@@ -120,18 +139,23 @@ namespace Xamarin.MagTek.Forms.Models
                 MagtekService.OnDataReceivedDelegate += MagtekService_OnDataReceivedDelegate;
                 MagtekService.OnDeviceConnectionDidChangeDelegate += MagtekService_OnDeviceConnectionDidChangeDelegate;
                 MagtekService.OnDeviceErrorDelegate += MagtekService_OnDeviceErrorDelegate;
+                MagtekService.OnDeviceNotPairedDelegate += MagtekService_OnDeviceNotPairedDelegate;
             }
             catch (Exception)
             {
                 throw;
             }
         }
+
+
         private void removeCardReaderEvents()
         {
             MagtekService.OnCardSwipeDidStartDelegate -= MagtekService_OnCardSwipeDidStartDelegate;
             MagtekService.OnDataReceivedDelegate -= MagtekService_OnDataReceivedDelegate;
             MagtekService.OnDeviceConnectionDidChangeDelegate -= MagtekService_OnDeviceConnectionDidChangeDelegate;
             MagtekService.OnDeviceErrorDelegate -= MagtekService_OnDeviceErrorDelegate;
+            MagtekService.OnDeviceNotPairedDelegate -= MagtekService_OnDeviceNotPairedDelegate;
+
         }
         private void MagtekService_OnCardSwipeDidStartDelegate(object instance)
         {
@@ -171,6 +195,7 @@ namespace Xamarin.MagTek.Forms.Models
             {
                 throw;
             }
+
         }
         private void MagtekService_OnDeviceConnectionDidChangeDelegate(int deviceType, bool connected, object instance, ConnectionState connectionState)
         {
@@ -186,17 +211,11 @@ namespace Xamarin.MagTek.Forms.Models
                 }
 
                 State = connectionState;
-
-                OnDeviceConnectionStateChanged?.Invoke(deviceType, connected, instance, connectionState);
             }
             catch (Exception)
             {
                 State = ConnectionState.Error;
                 throw;
-            }
-            finally
-            {
-                UpdateDeviceState();
             }
         }
         private void MagtekService_OnDeviceErrorDelegate(INSError error)
@@ -211,21 +230,38 @@ namespace Xamarin.MagTek.Forms.Models
                     Debugger.Log(0, "Trace", $"Connection Type: {MagtekService.ConnectionType()} = {((ConnectionType)MagtekService.ConnectionType()).ToString()}");
                     Debugger.Log(0, "Trace", $"Error: {JsonConvert.SerializeObject(error)}");
                 }
-
-                OnDeviceError?.Invoke(error);
             }
             catch (Exception)
             {
                 State = ConnectionState.Error;
                 throw;
             }
-            finally
+
+            OnDeviceError?.Invoke(error);
+        }
+        private void MagtekService_OnDeviceNotPairedDelegate()
+        {
+            try
             {
-                UpdateDeviceState();
+                if (Debugger.IsLogging())
+                {
+                    Debugger.Log(0, "Trace", "MagtekService_OnDeviceNotPairedDelegate invoked");
+                }
+
+                _deviceNotPairedButConnectedAndOpend = true;
+
+                OnDeviceNotPaired?.Invoke();
+            }
+            catch (Exception)
+            {
+                throw;
             }
         }
-        protected void UpdateDeviceState()
+        protected void UpdateDeviceMessages()
         {
+            if (_deviceNotPairedButConnectedAndOpend)
+                DisconnectDevice();// for some reason the connectionState is true, even if the user hits cancel when pair, which leads to a false positive. This is a little hack work around.
+
             ConnectionStatusMessage = null;
             switch (State)
             {
@@ -233,6 +269,9 @@ namespace Xamarin.MagTek.Forms.Models
                     ConnectionStatusMessage = "Something went wrong please try again.";
                     break;
                 case ConnectionState.Connected:
+                    if (Device.RuntimePlatform == Device.iOS)
+                        Bond = Bond.Bonded;
+
                     ConnectionStatusMessage = "Your device is ready to use.";
                     break;
                 case ConnectionState.Connecting:
@@ -251,24 +290,29 @@ namespace Xamarin.MagTek.Forms.Models
                     }
                     else
                     {
+                        if (Device.RuntimePlatform == Device.iOS)
+                            Bond = Bond.None;
+
                         ConnectionStatusMessage = "Device not Connected";
                     }
                     break;
             }
         }
-        public virtual void TryToConnectToDevice()
+        public async virtual Task TryToConnectToDeviceAsync()
         {
             try
             {
+                resetDeviceNotPaired();
+
                 if (deviceIsAlreadyConnectedAndOpen())
                     return;
 
                 closeDeviceIfAlreadyOpenButNotConnected();
 
-                //await Task.Delay(100);
+                await Task.Delay(100);
                 MagtekService.SetDeviceType(DeviceType.GetHashCode());
 
-                //await Task.Delay(100);
+                await Task.Delay(100);
                 MagtekService.SetConnectionType(ConnectionType.GetHashCode());
             }
             catch (Exception)
@@ -277,28 +321,6 @@ namespace Xamarin.MagTek.Forms.Models
                 throw;
             }
         }
-
-        //public async virtual Task TryToConnectToDeviceAsync()
-        //{
-        //    try
-        //    {
-        //        if (deviceIsAlreadyConnectedAndOpen())
-        //            return;
-
-        //        closeDeviceIfAlreadyOpenButNotConnected();
-
-        //        await Task.Delay(100);
-        //        MagtekService.SetDeviceType(DeviceType.GetHashCode());
-
-        //        await Task.Delay(100);
-        //        MagtekService.SetConnectionType(ConnectionType.GetHashCode());
-        //    }
-        //    catch (Exception)
-        //    {
-        //        State = ConnectionState.Error;
-        //        throw;
-        //    }
-        //}
         public bool CheckIfDeviceIsAlreadyConnected()
         {
             if (MagtekService.IsDeviceOpened()
@@ -321,17 +343,25 @@ namespace Xamarin.MagTek.Forms.Models
                 // close device
                 if (MagtekService.IsDeviceOpened())
                 {
-                    MagtekService.CloseDevice();
+                    MagtekService.ClearBuffers();
+                    if (MagtekService.CloseDevice())
+                        State = ConnectionState.Disconnected;
+                }
+                else if (State == ConnectionState.Connected)
+                {
+                    State = ConnectionState.Disconnected;
                 }
 
                 if (Device.RuntimePlatform == Device.iOS)
                 {
                     // set device type to none
+
                     MagtekService.SetDeviceType((int)DeviceType.MAGTEKNONE);
 
                     // set device type to none
                     MagtekService.SetConnectionType((int)DeviceType.MAGTEKAUDIOREADER);
                 }
+
             }
             catch (Exception)
             {
@@ -343,7 +373,10 @@ namespace Xamarin.MagTek.Forms.Models
         {
             return (MagtekService.DeviceType() == (short)DeviceType) == false;
         }
-
+        private void resetDeviceNotPaired()
+        {
+            _deviceNotPairedButConnectedAndOpend = false;
+        }
         #endregion
     }
 }

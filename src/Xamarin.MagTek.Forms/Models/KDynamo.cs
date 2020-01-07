@@ -14,6 +14,6 @@ namespace Xamarin.MagTek.Forms.Models
 
         public override DeviceType DeviceType => DeviceType.MAGTEKKDYNAMO;
 
-        public override ConnectionType ConnectionType => ConnectionType.Audio; // todo: is that correct connection Type
+        public override ConnectionType ConnectionType => ConnectionType.USB; // todo: is that correct connection Type
     }
 }

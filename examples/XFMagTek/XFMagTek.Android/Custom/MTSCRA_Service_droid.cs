@@ -366,20 +366,20 @@ namespace XFMagTek.Droid
                 case Xamarin.MagTek.Forms.Enums.ConnectionType.BLE:
                     _cardReader.SetConnectionType(MTConnectionType.Ble);
                     break;
-                case Xamarin.MagTek.Forms.Enums.ConnectionType.BLEEMV:
+                case Xamarin.MagTek.Forms.Enums.ConnectionType.BLE_EMV:
                     _cardReader.SetConnectionType(MTConnectionType.Bleemv);
                     break;
-                case Xamarin.MagTek.Forms.Enums.ConnectionType.Bluetooth:
-                    _cardReader.SetConnectionType(MTConnectionType.Bluetooth);
-                    break;
+                //case Xamarin.MagTek.Forms.Enums.ConnectionType.Bluetooth:
+                //    _cardReader.SetConnectionType(MTConnectionType.Bluetooth);
+                //    break;
                 case Xamarin.MagTek.Forms.Enums.ConnectionType.USB:
                     _cardReader.SetConnectionType(MTConnectionType.Usb);
                     break;
-                case Xamarin.MagTek.Forms.Enums.ConnectionType.Audio:
-                    _cardReader.SetConnectionType(MTConnectionType.Audio);
-                    break;
-                case Xamarin.MagTek.Forms.Enums.ConnectionType.Lightning:
-                    break;
+                //case Xamarin.MagTek.Forms.Enums.ConnectionType.Audio:
+                //    _cardReader.SetConnectionType(MTConnectionType.Audio);
+                //    break;
+                //case Xamarin.MagTek.Forms.Enums.ConnectionType.Lightning:
+                //    break;
             }
         }
 
@@ -566,7 +566,7 @@ namespace XFMagTek.Droid
 
             if (sender is MyBroadCastReciever broadCastReciever)
             {
-                // Okay, disabling the unsubscribe because if the user disconnects from the settings and returns the app, it get's out of sync, what happens with multiple??.
+                // Okay, disabling the unsubscribe because if the user disconnects from the settings and returns the app, it get's out of sync, what happens with multiple?
                 //if (bond != Bond.Bonding)
                 //    broadCastReciever.BondChanged-= OnBlueToothBondChangedDelegate_eventHandler;
             }

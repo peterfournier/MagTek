@@ -14,12 +14,19 @@
     }
     public enum ConnectionType
     {
-        Audio = 0,
-        BLE = 1,
-        BLEEMV = 2,
-        Bluetooth = 3,
-        USB = 4,
-        Lightning = 5
+        // OLD
+
+        //Audio = 0,
+        //BLE = 1,
+        //BLEEMV = 2,
+        //Bluetooth = 3,
+        //USB = 4,
+        //Lightning = 5
+
+        BLE,
+        BLE_EMV,
+        USB,
+        NONE,
     }
 
     public enum DeviceType

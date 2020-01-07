@@ -94,13 +94,13 @@ namespace XFMagTek.Views
         //        MagTekFactory.RegisterDevice(SelectedDevice);
         //    }
         //}, () => !IsBusy);
-        public ICommand ConnectToDeviceCommand => new Command(() =>
+        public ICommand ConnectToDeviceCommand => new Command(async () =>
         {
             IsBusy = true;
             if (SelectedDevice != null)
             {
-                //await SelectedDevice.TryToConnectToDeviceAsync();
-                SelectedDevice.TryToConnectToDevice();
+                await SelectedDevice.TryToConnectToDeviceAsync();
+                //SelectedDevice.TryToConnectToDevice();
             }
         }, () => !IsBusy);
         public ICommand DisconnectDevice => new Command(() =>
@@ -369,7 +369,7 @@ namespace XFMagTek.Views
             IsBusy = false;
         }
 
-        private void onDeviceConnectionStateChanged(int deviceType, bool connected, object instance, ConnectionState connectionState)
+        private void onDeviceConnectionStateChanged(ConnectionState connectionState)
         {
             //DataResponse += $"State Changed: {connectionState.ToString()}{Environment.NewLine}";
             //DataResponse += $"Connected: {connected}{Environment.NewLine}";

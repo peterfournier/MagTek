@@ -242,7 +242,7 @@
                             <Button
                                     IsVisible="{Binding IsBusy, Converter={x:Static utils:Converters.InverseBoolConverter}}"
                                     Command="{Binding ConnectToDeviceCommand}"
-                                    Text="Pair Device"
+                                    Text="Connect Device"
                                     HorizontalOptions="Start">
                             </Button>
 
