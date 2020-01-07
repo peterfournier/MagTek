@@ -5,7 +5,7 @@ Please refer to the MagTek SDK: https://www.magtek.com/support/edynamo?tab=softw
 Hope you enjoy!
 
 ### Roadmap:
-* Xamarin.Forms MagTek
+* ~~Xamarin.MagTek.Forms~~
 * Xamarin.Android MagTek
 * Xamarin.iOS MagTek
 * ~~Xamarin.Forms Example~~
